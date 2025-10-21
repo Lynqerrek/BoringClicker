@@ -1,98 +1,395 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>BoringClicker</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      height: 100vh;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>BoringClicker</title>
 
-    #gameContainer {
-      display: flex;
-      width: 800px;
-      margin-top: 50px;
-      justify-content: space-between;
-    }
+<style>
+  :root{
+    --bg1: #0f1724;
+    --bg2: #102a43;
+    --card: rgba(255,255,255,0.06);
+    --accent: linear-gradient(135deg,#ffd36b,#ff8ab6);
+    --glass: rgba(255,255,255,0.04);
+    --glass-2: rgba(255,255,255,0.02);
+    --glass-border: rgba(255,255,255,0.06);
+    --muted: #bfc9d9;
+    --glass-radius: 14px;
+  }
 
-    #leftPanel {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: flex-start;
-      width: 300px;
-    }
+  /* Page */
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+  body{
+    background: radial-gradient(1200px 600px at 10% 10%, rgba(255,138,182,0.06), transparent 8%),
+                linear-gradient(180deg,var(--bg1),var(--bg2));
+    color:#e6eef8;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:36px;
+    min-height:100vh;
+  }
 
-    h1 {
-      margin: 0 0 20px 0;
-      color: #333;
-    }
+  /* Main container */
+  #gameWrap{
+    width:100%;
+    max-width:980px;
+    display:flex;
+    gap:28px;
+    align-items:flex-start;
+  }
 
-    #counter {
-      font-size: 24px;
-      margin-bottom: 20px;
-      color: #555;
-    }
+  /* Left panel - info & upgrades */
+  .panel{
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+    border:1px solid var(--glass-border);
+    backdrop-filter: blur(8px);
+    padding:20px;
+    border-radius: var(--glass-radius);
+    box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+  }
 
-    #rightPanel {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 400px;
-    }
+  #leftPanel{
+    width:340px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
 
-    #cookieBtn {
-      cursor: pointer;
-      transition: transform 0.1s;
-      width: 200px;
-    }
+  .titleRow{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  h1{
+    margin:0;
+    font-size:20px;
+    letter-spacing:0.6px;
+  }
+  .sub{
+    color:var(--muted);
+    font-size:13px;
+  }
 
-    #cookieBtn:active {
-      transform: scale(0.95);
-    }
-  </style>
+  #totalCookies{
+    font-size:36px;
+    margin-top:6px;
+    font-weight:700;
+    color: #fff;
+    text-shadow: 0 6px 18px rgba(0,0,0,0.6);
+  }
+
+  .metaRow{
+    display:flex;
+    gap:10px;
+    margin-top:6px;
+  }
+  .meta{
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border: 1px solid rgba(255,255,255,0.03);
+    padding:10px 12px;
+    border-radius:10px;
+    font-size:13px;
+    min-width:120px;
+    text-align:left;
+  }
+  .meta strong{display:block;font-size:15px;color:#fff}
+
+  /* Upgrades area */
+  #upgrades{
+    margin-top:12px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .upgrade{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px;
+    border-radius:10px;
+    background:var(--glass-2);
+    border:1px solid rgba(255,255,255,0.015);
+  }
+  .upgrade .left{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .upgrade .left .name{font-weight:700}
+  .upgrade .left .desc{font-size:13px;color:var(--muted)}
+  .upgrade button{
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.08);
+    color:#fff;
+    padding:8px 12px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:700;
+    transition:transform .12s ease, box-shadow .12s ease, background .12s;
+  }
+  .upgrade button:active{transform:scale(.98)}
+  .upgrade button.buyable{
+    background: linear-gradient(90deg,#ffd36b,#ff8ab6);
+    color:#082032;
+    box-shadow: 0 6px 22px rgba(255,138,182,0.12);
+    border: none;
+  }
+  .cost {font-size:13px;color:var(--muted);margin-top:6px}
+
+  /* Right panel - big star */
+  #rightPanel{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    width:100%;
+    max-width:520px;
+  }
+
+  #starCard{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:28px;
+    border-radius:18px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border:1px solid rgba(255,255,255,0.04);
+    box-shadow: 0 12px 40px rgba(2,6,23,0.55);
+  }
+
+  #cookieBtn{
+    width:220px;
+    max-width:60%;
+    cursor:pointer;
+    user-select:none;
+    transform-origin:center;
+    transition: transform .12s ease, filter .12s ease;
+    will-change:transform;
+  }
+  #cookieBtn:hover{ transform:translateY(-6px) rotate(-2deg) }
+  #cookieBtn:active{ transform:scale(.94) rotate(0deg) }
+
+  /* small stats below star */
+  #starStats{
+    margin-top:14px;
+    display:flex;
+    gap:18px;
+    align-items:center;
+    justify-content:center;
+  }
+  .stat{
+    text-align:center;
+    padding:8px 14px;
+    border-radius:12px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border:1px solid rgba(255,255,255,0.03);
+    min-width:140px;
+  }
+  .stat .label{ font-size:12px; color:var(--muted); }
+  .stat .value{ margin-top:6px; font-size:18px; font-weight:800; color:#fff}
+
+  /* footer hint */
+  .hint{
+    margin-top:16px;
+    text-align:center;
+    color:var(--muted);
+    font-size:13px;
+  }
+
+  /* responsive */
+  @media (max-width:880px){
+    #gameWrap{flex-direction:column;align-items:center}
+    #leftPanel{width:100%;max-width:680px}
+    #rightPanel{width:100%}
+    #cookieBtn{width:200px}
+  }
+</style>
 </head>
+
 <body>
-  <div id="gameContainer">
-    <!-- Left side: counters / info -->
-    <div id="leftPanel">
-      <h1>BoringClicker</h1>
-      <div id="counter">Ciastek: 0</div>
+  <div id="gameWrap">
+    <!-- LEFT: info + upgrades -->
+    <div id="leftPanel" class="panel">
+      <div class="titleRow">
+        <div>
+          <h1>BoringClicker</h1>
+          <div class="sub">A tiny clicker — click the star on the right</div>
+        </div>
+        <div class="sub" style="text-align:right">v1.0</div>
+      </div>
+
+      <div id="totalCookies">0</div>
+
+      <div class="metaRow">
+        <div class="meta">
+          <div class="label">Cookies</div>
+          <strong id="metaTotal">0</strong>
+          <div class="cost">Total cookies collected</div>
+        </div>
+
+        <div class="meta">
+          <div class="label">Session</div>
+          <strong id="metaSession">0</strong>
+          <div class="cost">This session</div>
+        </div>
+      </div>
+
+      <div id="upgrades">
+        <div class="upgrade">
+          <div class="left">
+            <div class="name">Auto Star</div>
+            <div class="desc">Adds automatic CPS (1 cps each).</div>
+            <div class="cost">Owned: <span id="autoOwned">0</span></div>
+          </div>
+          <div>
+            <button id="buyAuto">Buy (10)</button>
+          </div>
+        </div>
+
+        <div class="upgrade">
+          <div class="left">
+            <div class="name">Click Strength</div>
+            <div class="desc">Increase cookies per click (+1 CPC).</div>
+            <div class="cost">Level: <span id="clickLevel">1</span></div>
+          </div>
+          <div>
+            <button id="buyClick">Upgrade (25)</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="hint">Tip: you can play this on GitHub Pages — just drop <code>StarClickMain.png</code> and this file into your repo.</div>
     </div>
 
-    <!-- Right side: clickable Star -->
+    <!-- RIGHT: big clickable star -->
     <div id="rightPanel">
-      <img id="cookieBtn" src="StarClickMain.png" alt="Star Click">
+      <div id="starCard" class="panel">
+        <img id="cookieBtn" src="StarClickMain.png" alt="StarClickMain">
+      </div>
+
+      <div id="starStats">
+        <div class="stat">
+          <div class="label">Cookies / second</div>
+          <div class="value" id="cpsValue">0</div>
+        </div>
+        <div class="stat">
+          <div class="label">Cookies / click</div>
+          <div class="value" id="cpcValue">1</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <script>
-    let cookies = 0;
-    const counter = document.getElementById('counter');
-    const btn = document.getElementById('cookieBtn');
+<script>
+/* BoringClicker - single-file prototype
+   Place StarClickMain.png next to this file in the repo root.
+   Small, modular logic with comments.
+*/
 
-    // Click handler
-    btn.addEventListener('click', () => {
-      cookies++;
-      updateCounter();
-    });
+let cookies = 0;             // total current cookies
+let sessionCookies = 0;      // session collected count
+let cookiesPerClick = 1;     // CPC (cookies gained per click)
+let autoCount = 0;           // number of auto clickers (each gives autoPower CPS)
+const autoPower = 1;        // each auto gives 1 CPS
+const basePassiveCPS = 0.2; // small passive CPS (to keep the feel from earlier auto every 5s)
 
-    // Simple AI: auto-click every 5 seconds
-    setInterval(() => {
-      cookies += 1;
-      updateCounter();
-    }, 5000);
+const totalEl = document.getElementById('totalCookies');
+const metaTotal = document.getElementById('metaTotal');
+const metaSession = document.getElementById('metaSession');
+const cpsEl = document.getElementById('cpsValue');
+const cpcEl = document.getElementById('cpcValue');
+const btn = document.getElementById('cookieBtn');
 
-    function updateCounter() {
-      counter.textContent = `Ciastek: ${cookies}`;
-    }
-  </script>
+const buyAutoBtn = document.getElementById('buyAuto');
+const buyClickBtn = document.getElementById('buyClick');
+const autoOwnedEl = document.getElementById('autoOwned');
+const clickLevelEl = document.getElementById('clickLevel');
+
+// helper to format numbers nicely (k = thousand, m = million)
+function pretty(n){
+  if (n >= 1_000_000_000) return (n/1_000_000_000).toFixed(2) + 'b';
+  if (n >= 1_000_000) return (n/1_000_000).toFixed(2) + 'm';
+  if (n >= 1000) return (n/1000).toFixed(2) + 'k';
+  return Math.floor(n).toString();
+}
+
+// compute current CPS
+function getCPS(){
+  return basePassiveCPS + (autoCount * autoPower);
+}
+
+// update any DOM numbers
+function refreshUI(){
+  totalEl.textContent = pretty(cookies);
+  metaTotal.textContent = pretty(cookies);
+  metaSession.textContent = pretty(sessionCookies);
+  cpsEl.textContent = getCPS().toFixed(2);
+  cpcEl.textContent = cookiesPerClick;
+  autoOwnedEl.textContent = autoCount;
+  clickLevelEl.textContent = cookiesPerClick;
+  // mark buy buttons as buyable or not
+  buyAutoBtn.classList.toggle('buyable', cookies >= 10);
+  buyClickBtn.classList.toggle('buyable', cookies >= 25);
+}
+
+// click the star
+btn.addEventListener('click', (e) => {
+  // visual click pop (tiny)
+  btn.style.transform = "scale(0.96)";
+  setTimeout(()=> btn.style.transform = "", 90);
+
+  cookies += cookiesPerClick;
+  sessionCookies += cookiesPerClick;
+  refreshUI();
+});
+
+// passive CPS adds cookies every second
+setInterval(() => {
+  const cps = getCPS();
+  // add cps each second (allow fractional CPS accumulation)
+  cookies += cps;
+  sessionCookies += cps;
+  refreshUI();
+}, 1000);
+
+// buy an auto clicker
+buyAutoBtn.addEventListener('click', () => {
+  const cost = 10 + Math.floor(autoCount * 5); // rising cost
+  if (cookies >= cost){
+    cookies -= cost;
+    autoCount += 1;
+    refreshUI();
+  } else {
+    flashButton(buyAutoBtn);
+  }
+});
+
+// upgrade click strength
+buyClickBtn.addEventListener('click', () => {
+  const cost = 25 + (cookiesPerClick-1) * 25;
+  if (cookies >= cost){
+    cookies -= cost;
+    cookiesPerClick += 1;
+    refreshUI();
+  } else {
+    flashButton(buyClickBtn);
+  }
+});
+
+function flashButton(el){
+  el.style.transform = "translateY(-4px)";
+  el.style.boxShadow = "0 8px 22px rgba(255,0,80,0.08)";
+  setTimeout(()=> { el.style.transform=""; el.style.boxShadow=""; }, 220);
+}
+
+// initial refresh
+refreshUI();
+</script>
 </body>
 </html>
