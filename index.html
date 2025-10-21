@@ -1,26 +1,51 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>StarClick Cookie Clicker</title>
+  <title>BoringClicker</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      text-align: center;
       background-color: #f2f2f2;
       margin: 0;
       padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      height: 100vh;
+    }
+
+    #gameContainer {
+      display: flex;
+      width: 800px;
+      margin-top: 50px;
+      justify-content: space-between;
+    }
+
+    #leftPanel {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      width: 300px;
     }
 
     h1 {
-      margin-top: 20px;
+      margin: 0 0 20px 0;
       color: #333;
     }
 
     #counter {
       font-size: 24px;
-      margin: 20px 0;
+      margin-bottom: 20px;
       color: #555;
+    }
+
+    #rightPanel {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 400px;
     }
 
     #cookieBtn {
@@ -35,22 +60,31 @@
   </style>
 </head>
 <body>
-  <h1>StarClick Cookie Clicker</h1>
-  <div id="counter">Ciastek: 0</div>
-  <img id="cookieBtn" src="StarClickMain.png" alt="Star Click">
+  <div id="gameContainer">
+    <!-- Left side: counters / info -->
+    <div id="leftPanel">
+      <h1>BoringClicker</h1>
+      <div id="counter">Ciastek: 0</div>
+    </div>
+
+    <!-- Right side: clickable Star -->
+    <div id="rightPanel">
+      <img id="cookieBtn" src="StarClickMain.png" alt="Star Click">
+    </div>
+  </div>
 
   <script>
     let cookies = 0;
     const counter = document.getElementById('counter');
     const btn = document.getElementById('cookieBtn');
 
-    // Kliknięcie obrazka
+    // Click handler
     btn.addEventListener('click', () => {
       cookies++;
       updateCounter();
     });
 
-    // Prosty AI: automatyczne kliknięcie co 5 sekund
+    // Simple AI: auto-click every 5 seconds
     setInterval(() => {
       cookies += 1;
       updateCounter();
