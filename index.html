@@ -17,7 +17,6 @@
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
   body{
-    /* background uses SpaceBackground.jfif; it's preloaded by script before revealing UI */
     background:
       radial-gradient(1200px 600px at 10% 10%, rgba(255,138,182,0.06), transparent 8%),
       linear-gradient(180deg, var(--bg1), var(--bg2)),
@@ -34,6 +33,23 @@
     min-height:100vh;
   }
 
+  /* Top settings button */
+  #settingsBtn{
+    position:fixed;
+    top:12px;
+    right:14px;
+    z-index:9998;
+    background: rgba(0,0,0,0.28);
+    border:1px solid rgba(255,255,255,0.06);
+    color:#eaf2ff;
+    padding:10px 12px;
+    border-radius:10px;
+    cursor:pointer;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+    font-weight:700;
+  }
+
   /* Loading overlay */
   #loadingOverlay{
     position:fixed;
@@ -41,7 +57,7 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    background:linear-gradient(180deg, rgba(2,6,23,0.85), rgba(2,6,23,0.9));
+    background:linear-gradient(180deg, rgba(2,6,23,0.92), rgba(2,6,23,0.95));
     z-index:9999;
     flex-direction:column;
     gap:18px;
@@ -116,7 +132,7 @@
   .upgrade button{background:transparent;border:1px solid rgba(255,255,255,0.08);color:#fff;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:700}
   .upgrade button.buyable{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#082032;border:none;box-shadow:0 6px 22px rgba(255,138,182,0.12)}
 
-  /* Buildings list - scrollable */
+  /* Buildings list - scrollable + styled scrollbar */
   #buildingsWrap{margin-top:10px}
   #buildingsList{
     margin-top:6px;
@@ -127,6 +143,13 @@
     overflow-y:auto;
     padding-right:8px;
   }
+  /* custom scrollbar */
+  #buildingsList::-webkit-scrollbar{width:10px}
+  #buildingsList::-webkit-scrollbar-track{background:transparent}
+  #buildingsList::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border-radius:10px;border:2px solid transparent;background-clip:padding-box}
+  /* firefox */
+  #buildingsList{scrollbar-width:thin;scrollbar-color: rgba(255,255,255,0.06) transparent}
+
   .building{display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.015);gap:10px}
   .b-left{display:flex;gap:10px;align-items:center}
   .b-icon{width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#082032;box-shadow:0 6px 18px rgba(255,138,182,0.08)}
@@ -140,7 +163,8 @@
 
   /* Right panel */
   #rightPanel{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;width:100%;max-width:660px}
-  #starCard{width:100%;display:flex;justify-content:center;align-items:center;padding:28px;border-radius:18px;background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 40px rgba(2,6,23,0.55)}
+  #starCard{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 28px;border-radius:18px;background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 40px rgba(2,6,23,0.55)}
+  #starName{font-weight:800;margin-bottom:10px;color:#fff}
   #cookieBtn{width:260px;max-width:60%;cursor:pointer;user-select:none;transform-origin:center;transition: transform .12s ease, filter .12s ease}
   #cookieBtn:hover{ transform:translateY(-6px) rotate(-2deg) }
   #cookieBtn:active{ transform:scale(.94) rotate(0deg) }
@@ -152,6 +176,15 @@
 
   .hint{margin-top:12px;text-align:center;color:var(--muted);font-size:13px}
 
+  /* Settings modal */
+  #settingsModal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:99999}
+  #settingsCard{background:#071025;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);width:420px;max-width:92%}
+  #settingsCard h3{margin:0 0 8px 0}
+  .row{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:12px}
+  .row label{font-size:13px;color:var(--muted);min-width:140px}
+  input[type="range"]{width:100%}
+  input[type="text"]{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaf2ff}
+
   @media (max-width:920px){
     #gameWrap{flex-direction:column;align-items:center}
     #leftPanel{width:100%;max-width:680px}
@@ -162,8 +195,10 @@
 </style>
 </head>
 <body>
+  <button id="settingsBtn" aria-haspopup="dialog">⚙ Settings</button>
+
   <!-- Loading overlay -->
-  <div id="loadingOverlay">
+  <div id="loadingOverlay" role="status" aria-live="polite">
     <div id="loadingBox">
       <div style="font-size:20px;font-weight:800">BoringClicker</div>
       <div style="margin-top:8px;color:var(--muted)">Loading assets — please wait</div>
@@ -172,7 +207,29 @@
     </div>
   </div>
 
-  <!-- Main game (hidden behind overlay until loaded) -->
+  <!-- Settings modal -->
+  <div id="settingsModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div id="settingsCard" class="panel">
+      <h3>Settings</h3>
+      <div style="font-size:13px;color:var(--muted)">Adjust sound volume and rename your StarCollector.</div>
+
+      <div class="row" style="margin-top:12px">
+        <label for="volumeRange">Sound Volume</label>
+        <input id="volumeRange" type="range" min="0" max="100" step="1" value="80" />
+      </div>
+
+      <div class="row">
+        <label for="nameInput">StarCollector name</label>
+        <input id="nameInput" type="text" maxlength="20" placeholder="StarCollector" />
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button id="settingsClose" class="buyBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main game (hidden until loaded) -->
   <div id="gameWrap" style="visibility:hidden;opacity:0;transition:opacity .4s ease">
     <!-- LEFT -->
     <div id="leftPanel" class="panel">
@@ -181,7 +238,7 @@
           <h1>BoringClicker</h1>
           <div class="sub">Buy space things — produce cookies per second</div>
         </div>
-        <div class="sub" style="text-align:right">v1.2</div>
+        <div class="sub" style="text-align:right">v1.3</div>
       </div>
 
       <div id="totalCookies">0</div>
@@ -207,10 +264,10 @@
           <div class="upgrade">
             <div class="left">
               <div class="name">Upgrade Click</div>
-              <div class="desc">Increase cookies per click by +1 (scales)</div>
+              <div class="desc">Increase cookies per click by +1 (very expensive, scales fast)</div>
             </div>
             <div>
-              <button id="buyClickUpgrade">Buy (5000)</button>
+              <button id="buyClickUpgrade">Buy</button>
             </div>
           </div>
 
@@ -221,7 +278,7 @@
               <div class="desc">Increase all building CPS by +10% per level</div>
             </div>
             <div>
-              <button id="buyEffUpgrade">Buy (15000)</button>
+              <button id="buyEffUpgrade">Buy</button>
             </div>
           </div>
         </div>
@@ -233,12 +290,13 @@
         <div id="buildingsList" role="list"></div>
       </div>
 
-      <div class="hint">Put <code>StarClickMain.png</code> and <code>SpaceBackground.jfif</code> next to this file in your repo.</div>
+      <div class="hint">Put <code>StarClickMain.png</code>, <code>SpaceBackground.jfif</code> and <code>ClickSound.mp3</code> beside this file in your repo.</div>
     </div>
 
     <!-- RIGHT -->
     <div id="rightPanel">
       <div id="starCard" class="panel">
+        <div id="starName">StarCollector</div>
         <img id="cookieBtn" src="StarClickMain.png" alt="StarClickMain" draggable="false">
       </div>
 
@@ -256,64 +314,77 @@
   </div>
 
 <script>
-/* BoringClicker v1.2
-  - Loading screen that waits for StarClickMain.png and SpaceBackground.jfif to load.
-  - Start with 0 CPS (basePassiveCPS = 0).
-  - Added upgrades: click upgrade (expensive) and building efficiency (expensive).
-  - Buildings list is scrollable (max-height set in CSS).
-  - All in one file.
+/* BoringClicker v1.3 - Features added:
+ - Click sound for player clicks and building purchases (ClickSound.mp3)
+ - Global sound rate-limiter adaptive with CPS (prevents spam at huge CPS)
+ - Settings modal with volume slider and rename field (max 20 chars)
+ - StarCollector name shown above the star
+ - Scrollbar styling
+ - Asset preloading (Star image, background, sound) with loading bar
+ - Harder progression: building cost scaling increased (1.17^owned) and expensive upgrades
 */
 
-/* ---------- ASSET LOADING (loading screen) ---------- */
-// list of assets to wait for
-const assets = ['StarClickMain.png', 'SpaceBackground.jfif'];
+// ASSETS TO PRELOAD
+const assets = ['StarClickMain.png', 'SpaceBackground.jfif', 'ClickSound.mp3'];
 let assetsLoaded = 0;
-
 const loadingOverlay = document.getElementById('loadingOverlay');
 const loadingBar = document.getElementById('loadingBar');
 const loadingPercent = document.getElementById('loadingPercent');
 const gameWrap = document.getElementById('gameWrap');
 
+// SETTINGS STORAGE KEYS
+const LS_VOLUME = 'bc_volume_v1';
+const LS_NAME = 'bc_name_v1';
+
+// AUDIO: preload
+let clickAudio = new Audio('ClickSound.mp3');
+clickAudio.preload = 'auto';
+clickAudio.crossOrigin = 'anonymous';
+
+// Try to count audio as loaded when canplaythrough fires
+clickAudio.addEventListener('canplaythrough', () => { assetsLoaded++; updateLoadingProgress(); revealIfReady(); }, { once: true });
+clickAudio.addEventListener('error', () => { console.warn('Click sound failed to load'); assetsLoaded++; updateLoadingProgress(); revealIfReady(); }, { once: true });
+
+// preload images
+assets.filter(a => a.endsWith('.png') || a.endsWith('.jfif')).forEach(src => {
+  const img = new Image();
+  img.src = src;
+  img.onload = () => { assetsLoaded++; updateLoadingProgress(); revealIfReady(); };
+  img.onerror = () => { console.warn('Asset failed:', src); assetsLoaded++; updateLoadingProgress(); revealIfReady(); };
+});
+
+// helper to update loading bar
 function updateLoadingProgress(){
   const pct = Math.round((assetsLoaded / assets.length) * 100);
   loadingBar.style.width = pct + '%';
   loadingPercent.textContent = pct + '%';
 }
+function revealIfReady(){
+  if (assetsLoaded >= assets.length){
+    // small polish delay
+    setTimeout(()=> {
+      loadingOverlay.style.transition = 'opacity .4s ease';
+      loadingOverlay.style.opacity = 0;
+      setTimeout(()=> loadingOverlay.remove(), 420);
+      gameWrap.style.visibility = 'visible';
+      gameWrap.style.opacity = '1';
+    }, 300);
+  }
+}
 
-// preload images and wait
-assets.forEach(src => {
-  const img = new Image();
-  img.src = src;
-  img.onload = () => {
-    assetsLoaded++;
-    updateLoadingProgress();
-    if (assetsLoaded === assets.length) {
-      // small delay for polish
-      setTimeout(()=> {
-        loadingOverlay.style.transition = 'opacity .4s ease';
-        loadingOverlay.style.opacity = 0;
-        setTimeout(()=> loadingOverlay.remove(), 420);
-        // reveal game
-        gameWrap.style.visibility = 'visible';
-        gameWrap.style.opacity = '1';
-      }, 350);
+// If audio didn't fire canplaythrough (browser policy), also count it as loaded after short timeout
+setTimeout(()=> {
+  if (assetsLoaded < assets.length){
+    // assume audio load attempt done
+    if (!clickAudio.readyState || clickAudio.readyState < 3) {
+      // we still increment to avoid blocking
+      assetsLoaded = Math.min(assets.length, assetsLoaded + 1);
+      updateLoadingProgress();
+      revealIfReady();
     }
-  };
-  img.onerror = () => {
-    // If asset fails to load, still progress so user can play (but warn in console)
-    console.warn('Failed to load asset:', src);
-    assetsLoaded++;
-    updateLoadingProgress();
-    if (assetsLoaded === assets.length) {
-      setTimeout(()=> {
-        loadingOverlay.style.opacity = 0;
-        setTimeout(()=> loadingOverlay.remove(), 420);
-        gameWrap.style.visibility = 'visible';
-        gameWrap.style.opacity = '1';
-      }, 350);
-    }
-  };
-});
+  }
+}, 2000);
+
 
 /* ---------- GAME STATE ---------- */
 let cookies = 0;
@@ -321,15 +392,17 @@ let sessionCookies = 0;
 let cookiesPerClick = 1; // initial CPC
 let clickUpgradeLevel = 0; // number of click upgrades purchased
 let effUpgradeLevel = 0;   // building efficiency levels (each +10%)
+
+// building definitions (more expensive; scaled to be harder)
 let buildingDefs = [
-  { id: 'telescope', name: 'Telescope', baseCost: 500, baseCPS: 1.5, desc: 'Basic science: small CPS' },
-  { id: 'space_rocket', name: 'Space Rocket', baseCost: 2500, baseCPS: 9, desc: 'Rockets launching probes' },
-  { id: 'satellite', name: 'Satellite', baseCost: 15000, baseCPS: 80, desc: 'Orbiting machines, steady income' },
-  { id: 'space_station', name: 'Space Station', baseCost: 120000, baseCPS: 700, desc: 'Big orbital platform' },
-  { id: 'solar_probe', name: 'Solar Probe', baseCost: 650000, baseCPS: 3600, desc: 'Expensive probes near stars' },
-  { id: 'tiny_planet', name: 'Tiny Planet', baseCost: 4000000, baseCPS: 20000, desc: 'Small artificial world' },
-  { id: 'gas_giant', name: 'Gas Giant', baseCost: 30000000, baseCPS: 150000, desc: 'Huge yields but very expensive' },
-  { id: 'alien_megaplanet', name: 'Alien Megaplanet', baseCost: 250000000, baseCPS: 1200000, desc: 'Mega investment: massive CPS' }
+  { id: 'telescope', name: 'Telescope', baseCost: 1000, baseCPS: 2.5, desc: 'Basic science: small CPS' },
+  { id: 'space_rocket', name: 'Space Rocket', baseCost: 8000, baseCPS: 22, desc: 'Rockets launching probes' },
+  { id: 'satellite', name: 'Satellite', baseCost: 45000, baseCPS: 210, desc: 'Orbiting machines, steady income' },
+  { id: 'space_station', name: 'Space Station', baseCost: 350000, baseCPS: 1800, desc: 'Big orbital platform' },
+  { id: 'solar_probe', name: 'Solar Probe', baseCost: 2200000, baseCPS: 10000, desc: 'Expensive probes near stars' },
+  { id: 'tiny_planet', name: 'Tiny Planet', baseCost: 16000000, baseCPS: 53000, desc: 'Small artificial world' },
+  { id: 'gas_giant', name: 'Gas Giant', baseCost: 120000000, baseCPS: 420000, desc: 'Huge yields but very expensive' },
+  { id: 'alien_megaplanet', name: 'Alien Megaplanet', baseCost: 900000000, baseCPS: 3500000, desc: 'Mega investment: massive CPS' }
 ];
 
 // per-building owned count
@@ -344,9 +417,45 @@ const cpsEl = document.getElementById('cpsValue');
 const cpcEl = document.getElementById('cpcValue');
 const btn = document.getElementById('cookieBtn');
 const buildingsList = document.getElementById('buildingsList');
+const starNameEl = document.getElementById('starName');
 
 const buyClickUpgradeBtn = document.getElementById('buyClickUpgrade');
 const buyEffUpgradeBtn = document.getElementById('buyEffUpgrade');
+
+const settingsBtn = document.getElementById('settingsBtn');
+const settingsModal = document.getElementById('settingsModal');
+const settingsClose = document.getElementById('settingsClose');
+const volumeRange = document.getElementById('volumeRange');
+const nameInput = document.getElementById('nameInput');
+
+/* ---------- SETTINGS (volume & name) ---------- */
+let volume = Number(localStorage.getItem(LS_VOLUME) ?? 80) / 100; // 0..1
+let starName = localStorage.getItem(LS_NAME) ?? 'StarCollector';
+volumeRange.value = Math.round(volume * 100);
+nameInput.value = starName;
+starNameEl.textContent = starName;
+
+// update volume slider handler
+volumeRange.addEventListener('input', (e) => {
+  volume = Number(e.target.value) / 100;
+  localStorage.setItem(LS_VOLUME, Math.round(volume * 100));
+  // set audio volume for base audio
+  clickAudio.volume = volume;
+});
+nameInput.addEventListener('input', (e) => {
+  const val = e.target.value.slice(0, 20);
+  starName = val || 'StarCollector';
+  starNameEl.textContent = starName;
+  localStorage.setItem(LS_NAME, starName);
+});
+settingsBtn.addEventListener('click', () => {
+  settingsModal.style.display = 'flex';
+  settingsModal.setAttribute('aria-hidden','false');
+});
+settingsClose.addEventListener('click', () => {
+  settingsModal.style.display = 'none';
+  settingsModal.setAttribute('aria-hidden','true');
+});
 
 /* ---------- HELPERS ---------- */
 function pretty(n){
@@ -356,19 +465,17 @@ function pretty(n){
   return Math.floor(n).toString();
 }
 
-// building cost formula: baseCost * (1.15 ^ owned)
+// building cost formula: baseCost * (1.17 ^ owned) - slightly harsher scaling
 function getBuildingCost(def, owned){
-  return Math.ceil(def.baseCost * Math.pow(1.15, owned));
+  return Math.ceil(def.baseCost * Math.pow(1.17, owned));
 }
 
 // upgrade costs formula (scaling)
-// click upgrade cost grows fast to avoid OP early: base 5000 * (3 ^ level)
 function getClickUpgradeCost(level){
-  return Math.ceil(5000 * Math.pow(3, level));
+  return Math.ceil(8000 * Math.pow(3.2, level)); // very steep
 }
-// efficiency upgrade cost: base 15000 * (2.5 ^ level)
 function getEffUpgradeCost(level){
-  return Math.ceil(15000 * Math.pow(2.5, level));
+  return Math.ceil(25000 * Math.pow(2.8, level));
 }
 
 // get total building CPS including efficiency multiplier
@@ -376,17 +483,61 @@ function getBuildingCPS(){
   let total = 0;
   for (const def of buildingDefs){
     const owned = buildingsState[def.id].owned;
-    const base = owned * def.baseCPS;
-    total += base;
+    total += owned * def.baseCPS;
   }
-  // apply efficiency upgrade: each level = +10% => multiplier = 1 + 0.1 * effUpgradeLevel
   const multiplier = 1 + 0.1 * effUpgradeLevel;
   return total * multiplier;
 }
 
-// total CPS (start at zero unless buildings bought)
+// total CPS (no passive base)
 function getCPS(){
-  return getBuildingCPS(); // basePassive = 0
+  return getBuildingCPS();
+}
+
+/* ---------- AUDIO RATE LIMITER ---------- */
+/*
+ Strategy:
+  - All click/purchase sounds go through playSound().
+  - We keep an array of timestamps (ms) of last sounds.
+  - Allowed sounds per second decreases slightly as CPS grows (so very high CPS -> fewer allowed sounds).
+  - Formula: maxSounds = clamp(1, 12, 12 - floor(log10(getCPS()+10)))
+    (for low CPS we allow many sounds; for huge CPS allowed number lower).
+  - playSound checks how many sounds played last 1000ms and blocks if over limit.
+  - Manual clicks and purchases still request playSound(), but will be rate-limited.
+  - Volume controlled by settings.
+*/
+
+let soundTimestamps = []; // timestamps in ms
+clickAudio.volume = volume;
+clickAudio.loop = false;
+
+function getMaxSoundsPerSecond(){
+  const cps = getCPS();
+  // log10 scaling helps reduce allowed at huge CPS; keep min 1
+  const v = 12 - Math.floor(Math.log10(cps + 10));
+  return Math.max(1, Math.min(12, v));
+}
+
+function playSound(){
+  const now = Date.now();
+  // remove old timestamps > 1s
+  soundTimestamps = soundTimestamps.filter(t => (now - t) <= 1000);
+  const maxAllowed = getMaxSoundsPerSecond();
+  if (soundTimestamps.length >= maxAllowed) {
+    // too many sounds recently -> skip
+    return false;
+  }
+  soundTimestamps.push(now);
+  // play a cloned audio element to allow overlapping
+  try {
+    const a = clickAudio.cloneNode();
+    a.volume = volume;
+    a.play().catch(()=>{/* ignore play promise errors until user gesture */});
+  } catch(e){
+    // fallback: try to reset & play the base audio
+    try { clickAudio.currentTime = 0; clickAudio.volume = volume; clickAudio.play().catch(()=>{}); } catch(_) {}
+  }
+  return true;
 }
 
 /* ---------- RENDER UI ---------- */
@@ -432,6 +583,7 @@ function refreshUI(){
   metaSession.textContent = pretty(Math.floor(sessionCookies));
   cpsEl.textContent = getCPS().toFixed(2);
   cpcEl.textContent = cookiesPerClick;
+
   // upgrades buttons
   const clickCost = getClickUpgradeCost(clickUpgradeLevel);
   buyClickUpgradeBtn.textContent = `Buy (${pretty(clickCost)})`;
@@ -441,18 +593,24 @@ function refreshUI(){
   buyEffUpgradeBtn.textContent = `Buy (${pretty(effCost)})`;
   buyEffUpgradeBtn.classList.toggle('buyable', cookies >= effCost);
 
+  // name display
+  starNameEl.textContent = starName;
+
   renderBuildings();
 }
 
 /* ---------- INTERACTIONS ---------- */
-// Star click
+// Manual star click -> plays sound (rate-limited), adds cookies
 btn.addEventListener('click', () => {
-  // tiny pop
+  // small visual pop
   btn.style.transform = "scale(0.96)";
-  setTimeout(()=> btn.style.transform = "", 90);
+  setTimeout(()=> btn.style.transform = "", 120);
 
   cookies += cookiesPerClick;
   sessionCookies += cookiesPerClick;
+
+  // try to play click sound (rate-limited)
+  playSound();
   refreshUI();
 });
 
@@ -465,9 +623,13 @@ function attemptBuy(id){
   if (cookies >= cost){
     cookies -= cost;
     state.owned += 1;
+    // play purchase sound (rate-limited through same system)
+    playSound();
     refreshUI();
   } else {
-    flashButton(document.querySelector(`.buyBtn[data-id="${id}"]`));
+    // flash button visually
+    const btnEl = document.querySelector(`.buyBtn[data-id="${id}"]`);
+    flashButton(btnEl);
   }
 }
 
@@ -478,6 +640,7 @@ buyClickUpgradeBtn.addEventListener('click', () => {
     cookies -= cost;
     clickUpgradeLevel += 1;
     cookiesPerClick += 1; // +1 CPC per upgrade
+    playSound();
     refreshUI();
   } else {
     flashButton(buyClickUpgradeBtn);
@@ -490,6 +653,7 @@ buyEffUpgradeBtn.addEventListener('click', () => {
   if (cookies >= cost){
     cookies -= cost;
     effUpgradeLevel += 1;
+    playSound();
     refreshUI();
   } else {
     flashButton(buyEffUpgradeBtn);
@@ -504,24 +668,60 @@ function flashButton(el){
 }
 
 /* ---------- PASSIVE CPS TICK ---------- */
-// accumulate CPS each second (fractional allowed)
+/*
+ - Add CPS per second.
+ - We will optionally play a passive sound occasionally, but heavily rate-limited by playSound()
+   (so high CPS won't spam sounds because getMaxSoundsPerSecond() drops a bit for huge CPS).
+*/
 setInterval(() => {
   const cps = getCPS();
   if (cps > 0){
     cookies += cps;
     sessionCookies += cps;
+
+    // occasionally play passive sound: request playSound() but it may be limited
+    // We trigger passive sound only if enough accumulated passive since last passive play
+    // to avoid playing every tick; simpler: playSound() but it will be rate-limited globally.
+    // We'll call it only if cps >= threshold (so small CPS doesn't play extra)
+    if (cps >= 100) { // for cps >=100 -> attempt passive sound once per second (and rate-limiter will cap)
+      playSound();
+    } else if (cps >= 5000) {
+      // higher CPS attempt more frequently (still rate-limited)
+      playSound();
+    }
     refreshUI();
   } else {
-    // still refresh quick UI to keep values accurate
     refreshUI();
   }
 }, 1000);
 
-/* ---------- INITIAL RENDER ---------- */
+/* ---------- INITIAL RENDER & PREP ---------- */
 renderBuildings();
 refreshUI();
 
+// make sure initial audio volume matches setting
+clickAudio.volume = volume;
+
+// Expose a quick keyboard for settings (Esc closes)
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    settingsModal.style.display = 'none';
+    settingsModal.setAttribute('aria-hidden','true');
+  }
+});
+
+// Save name on blur to localStorage as safety
+nameInput.addEventListener('blur', () => {
+  localStorage.setItem(LS_NAME, nameInput.value.slice(0,20) || 'StarCollector');
+});
+
+// ensure settings modal closes when clicking outside the card
+settingsModal.addEventListener('click', (e) => {
+  if (e.target === settingsModal) {
+    settingsModal.style.display = 'none';
+    settingsModal.setAttribute('aria-hidden','true');
+  }
+});
 </script>
 </body>
 </html>
-
