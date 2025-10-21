@@ -14,6 +14,8 @@
     --glass-border: rgba(255,255,255,0.06);
     --muted: #bfc9d9;
     --glass-radius: 14px;
+    --accent1: #ffd36b;
+    --accent2: #ff8ab6;
   }
 
   /* Reset & base */
@@ -42,7 +44,7 @@
   /* Main container */
   #gameWrap{
     width:100%;
-    max-width:980px;
+    max-width:1080px;
     display:flex;
     gap:28px;
     align-items:flex-start;
@@ -60,7 +62,7 @@
 
   /* Left panel */
   #leftPanel{
-    width:340px;
+    width:380px;
     display:flex;
     flex-direction:column;
     gap:14px;
@@ -105,56 +107,55 @@
   }
   .meta strong{display:block;font-size:15px;color:#fff}
 
-  /* Upgrades */
-  #upgrades{
-    margin-top:12px;
+  /* Buildings list */
+  #buildingsList{
+    margin-top:10px;
     display:flex;
     flex-direction:column;
     gap:10px;
   }
-  .upgrade{
+  .building{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:10px;
+    padding:12px;
     border-radius:10px;
     background:var(--glass-2);
     border:1px solid rgba(255,255,255,0.015);
+    gap:10px;
   }
-  .upgrade .left{
+  .b-left{
     display:flex;
-    flex-direction:column;
-    gap:4px;
+    gap:10px;
+    align-items:center;
   }
-  .upgrade .left .name{font-weight:700}
-  .upgrade .left .desc{font-size:13px;color:var(--muted)}
-  .upgrade button{
-    background:transparent;
-    border:1px solid rgba(255,255,255,0.08);
-    color:#fff;
-    padding:8px 12px;
-    border-radius:10px;
-    cursor:pointer;
-    font-weight:700;
+  .b-icon{
+    width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,var(--accent1),var(--accent2));
+    display:flex;align-items:center;justify-content:center;font-weight:800;color:#082032;
+    box-shadow: 0 6px 18px rgba(255,138,182,0.08);
+  }
+  .b-info{display:flex;flex-direction:column}
+  .b-info .name{font-weight:800}
+  .b-info .desc{font-size:12px;color:var(--muted)}
+  .b-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+  .b-cost{font-size:13px;color:var(--muted)}
+  .buyBtn{
+    background:transparent;border:1px solid rgba(255,255,255,0.08);color:#fff;padding:6px 10px;border-radius:10px;cursor:pointer;font-weight:700;
     transition:transform .12s ease, box-shadow .12s ease, background .12s;
   }
-  .upgrade button:active{transform:scale(.98)}
-  .upgrade button.buyable{
-    background: linear-gradient(90deg,#ffd36b,#ff8ab6);
-    color:#082032;
-    box-shadow: 0 6px 22px rgba(255,138,182,0.12);
-    border: none;
+  .buyBtn.buyable{
+    background: linear-gradient(90deg,var(--accent1),var(--accent2));
+    color:#082032;border:none;box-shadow: 0 6px 22px rgba(255,138,182,0.12);
   }
-  .cost {font-size:13px;color:var(--muted);margin-top:6px}
 
-  /* Right panel */
+  /* Right panel - big star */
   #rightPanel{
     display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:flex-start;
     width:100%;
-    max-width:520px;
+    max-width:660px;
   }
 
   #starCard{
@@ -170,7 +171,7 @@
   }
 
   #cookieBtn{
-    width:220px;
+    width:260px;
     max-width:60%;
     cursor:pointer;
     user-select:none;
@@ -209,25 +210,25 @@
   }
 
   /* responsive */
-  @media (max-width:880px){
+  @media (max-width:920px){
     #gameWrap{flex-direction:column;align-items:center}
     #leftPanel{width:100%;max-width:680px}
     #rightPanel{width:100%}
-    #cookieBtn{width:200px}
+    #cookieBtn{width:220px}
   }
 </style>
 </head>
 
 <body>
   <div id="gameWrap">
-    <!-- LEFT: info + upgrades -->
+    <!-- LEFT: info & buildings -->
     <div id="leftPanel" class="panel">
       <div class="titleRow">
         <div>
           <h1>BoringClicker</h1>
-          <div class="sub">A tiny clicker — click the star on the right</div>
+          <div class="sub">Buy space things — they produce cookies per second</div>
         </div>
-        <div class="sub" style="text-align:right">v1.0</div>
+        <div class="sub" style="text-align:right">v1.1</div>
       </div>
 
       <div id="totalCookies">0</div>
@@ -236,7 +237,7 @@
         <div class="meta">
           <div class="label">Cookies</div>
           <strong id="metaTotal">0</strong>
-          <div class="cost">Total cookies collected</div>
+          <div class="cost">Total cookies available</div>
         </div>
 
         <div class="meta">
@@ -246,31 +247,12 @@
         </div>
       </div>
 
-      <div id="upgrades">
-        <div class="upgrade">
-          <div class="left">
-            <div class="name">Auto Star</div>
-            <div class="desc">Adds automatic CPS (1 cps each).</div>
-            <div class="cost">Owned: <span id="autoOwned">0</span></div>
-          </div>
-          <div>
-            <button id="buyAuto">Buy (10)</button>
-          </div>
-        </div>
-
-        <div class="upgrade">
-          <div class="left">
-            <div class="name">Click Strength</div>
-            <div class="desc">Increase cookies per click (+1 CPC).</div>
-            <div class="cost">Level: <span id="clickLevel">1</span></div>
-          </div>
-          <div>
-            <button id="buyClick">Upgrade (25)</button>
-          </div>
-        </div>
+      <div style="margin-top:12px">
+        <div class="sub" style="margin-bottom:8px">Buildings</div>
+        <div id="buildingsList"></div>
       </div>
 
-      <div class="hint">Tip: put <code>StarClickMain.png</code> and <code>SpaceBackground.jfif</code> next to this file in your repo to make it work on GitHub Pages.</div>
+      <div class="hint">Tip: Put <code>StarClickMain.png</code> and <code>SpaceBackground.jfif</code> beside this file in your repo.</div>
     </div>
 
     <!-- RIGHT: big clickable star -->
@@ -293,30 +275,45 @@
   </div>
 
 <script>
-/* BoringClicker - single-file prototype
-   Place StarClickMain.png and SpaceBackground.jfif next to this file in the repo root.
+/* BoringClicker v1.1
+   Single-file game. Put StarClickMain.png and SpaceBackground.jfif next to this file.
+   New buildings: Space Rocket, Satellite, Space Station, Telescope, Solar Probe,
+   plus some fake planets (Tiny Planet, Gas Giant, Alien Megaplanet).
+   Price scales with number owned (exponential).
 */
 
-let cookies = 0;             // total current cookies
-let sessionCookies = 0;      // session collected count
-let cookiesPerClick = 1;     // CPC (cookies gained per click)
-let autoCount = 0;           // number of auto clickers (each gives autoPower CPS)
-const autoPower = 1;         // each auto gives 1 CPS
-const basePassiveCPS = 0.2;  // small passive CPS
+// GAME STATE
+let cookies = 0;
+let sessionCookies = 0;
+let cookiesPerClick = 1; // CPC for clicking the star
 
+// building definitions: name, baseCost, baseCPS
+const buildingDefs = [
+  { id: 'telescope', name: 'Telescope', baseCost: 50, baseCPS: 1.5, desc: 'Basic science: small CPS' },
+  { id: 'space_rocket', name: 'Space Rocket', baseCost: 120, baseCPS: 6, desc: 'Cheap rockets launching probes' },
+  { id: 'satellite', name: 'Satellite', baseCost: 700, baseCPS: 40, desc: 'Orbiting machines, steady income' },
+  { id: 'space_station', name: 'Space Station', baseCost: 3500, baseCPS: 260, desc: 'Big orbital platform' },
+  { id: 'solar_probe', name: 'Solar Probe', baseCost: 12000, baseCPS: 1200, desc: 'Expensive probes close to stars' },
+  // fake planets (plural)
+  { id: 'tiny_planet', name: 'Tiny Planet', baseCost: 45000, baseCPS: 6000, desc: 'Small artificial world' },
+  { id: 'gas_giant', name: 'Gas Giant', baseCost: 250000, baseCPS: 35000, desc: 'Huge yields but very expensive' },
+  { id: 'alien_megaplanet', name: 'Alien Megaplanet', baseCost: 2000000, baseCPS: 300000, desc: 'Mega investment: massive CPS' }
+];
+
+// dynamic state per building
+const buildingsState = {};
+buildingDefs.forEach(b => buildingsState[b.id] = { owned: 0 });
+
+// UI refs
 const totalEl = document.getElementById('totalCookies');
 const metaTotal = document.getElementById('metaTotal');
 const metaSession = document.getElementById('metaSession');
 const cpsEl = document.getElementById('cpsValue');
 const cpcEl = document.getElementById('cpcValue');
 const btn = document.getElementById('cookieBtn');
+const buildingsList = document.getElementById('buildingsList');
 
-const buyAutoBtn = document.getElementById('buyAuto');
-const buyClickBtn = document.getElementById('buyClick');
-const autoOwnedEl = document.getElementById('autoOwned');
-const clickLevelEl = document.getElementById('clickLevel');
-
-// pretty number formatting
+// helpers
 function pretty(n){
   if (n >= 1_000_000_000) return (n/1_000_000_000).toFixed(2) + 'b';
   if (n >= 1_000_000) return (n/1_000_000).toFixed(2) + 'm';
@@ -324,26 +321,86 @@ function pretty(n){
   return Math.floor(n).toString();
 }
 
-// compute current CPS
-function getCPS(){
-  return basePassiveCPS + (autoCount * autoPower);
+// pricing formula: baseCost * (1.15 ^ owned)
+function getCost(def, owned){
+  return Math.ceil(def.baseCost * Math.pow(1.15, owned));
 }
 
-// update UI
+// compute total CPS from buildings + small basePassiveCPS
+const basePassiveCPS = 0.1; // tiny passive
+function getCPS(){
+  let total = basePassiveCPS;
+  for (const def of buildingDefs){
+    const state = buildingsState[def.id];
+    total += state.owned * def.baseCPS;
+  }
+  return total;
+}
+
+// render buildings UI dynamically
+function renderBuildings(){
+  buildingsList.innerHTML = '';
+  buildingDefs.forEach(def => {
+    const state = buildingsState[def.id];
+    const cost = getCost(def, state.owned);
+    const b = document.createElement('div');
+    b.className = 'building';
+
+    b.innerHTML = `
+      <div class="b-left">
+        <div class="b-icon">${def.name.split(' ').map(s=>s[0]).slice(0,2).join('')}</div>
+        <div class="b-info">
+          <div class="name">${def.name}</div>
+          <div class="desc">${def.desc}</div>
+        </div>
+      </div>
+      <div class="b-right">
+        <div class="b-cost">Cost: <strong>${pretty(cost)}</strong></div>
+        <div class="b-cost">Gives: <strong>${def.baseCPS}</strong> CPS each</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="font-size:13px;color:var(--muted);">Owned: <strong>${state.owned}</strong></div>
+          <button class="buyBtn" data-id="${def.id}" data-cost="${cost}">Buy</button>
+        </div>
+      </div>
+    `;
+    buildingsList.appendChild(b);
+  });
+  // wire buy buttons
+  document.querySelectorAll('.buyBtn').forEach(btnEl=>{
+    const id = btnEl.getAttribute('data-id');
+    const cost = Number(btnEl.getAttribute('data-cost'));
+    btnEl.classList.toggle('buyable', cookies >= cost);
+    btnEl.onclick = () => attemptBuy(id);
+  });
+}
+
+// attempt purchase
+function attemptBuy(id){
+  const def = buildingDefs.find(d=>d.id===id);
+  if (!def) return;
+  const state = buildingsState[id];
+  const cost = getCost(def, state.owned);
+  if (cookies >= cost){
+    cookies -= cost;
+    state.owned += 1;
+    refreshUI();
+  } else {
+    flashButton(document.querySelector(`.buyBtn[data-id="${id}"]`));
+  }
+}
+
+// UI refresh
 function refreshUI(){
-  totalEl.textContent = pretty(cookies);
-  metaTotal.textContent = pretty(cookies);
-  metaSession.textContent = pretty(sessionCookies);
+  totalEl.textContent = pretty(Math.floor(cookies));
+  metaTotal.textContent = pretty(Math.floor(cookies));
+  metaSession.textContent = pretty(Math.floor(sessionCookies));
   cpsEl.textContent = getCPS().toFixed(2);
   cpcEl.textContent = cookiesPerClick;
-  autoOwnedEl.textContent = autoCount;
-  clickLevelEl.textContent = cookiesPerClick;
-  buyAutoBtn.classList.toggle('buyable', cookies >= 10);
-  buyClickBtn.classList.toggle('buyable', cookies >= 25);
+  renderBuildings();
 }
 
-// click handler
-btn.addEventListener('click', (e) => {
+// clicking the star
+btn.addEventListener('click', () => {
   btn.style.transform = "scale(0.96)";
   setTimeout(()=> btn.style.transform = "", 90);
 
@@ -352,7 +409,7 @@ btn.addEventListener('click', (e) => {
   refreshUI();
 });
 
-// passive CPS (per second)
+// passive CPS accumulates each second (allow fractional)
 setInterval(() => {
   const cps = getCPS();
   cookies += cps;
@@ -360,38 +417,17 @@ setInterval(() => {
   refreshUI();
 }, 1000);
 
-// buy auto
-buyAutoBtn.addEventListener('click', () => {
-  const cost = 10 + Math.floor(autoCount * 5);
-  if (cookies >= cost){
-    cookies -= cost;
-    autoCount += 1;
-    refreshUI();
-  } else {
-    flashButton(buyAutoBtn);
-  }
-});
-
-// upgrade click
-buyClickBtn.addEventListener('click', () => {
-  const cost = 25 + (cookiesPerClick-1) * 25;
-  if (cookies >= cost){
-    cookies -= cost;
-    cookiesPerClick += 1;
-    refreshUI();
-  } else {
-    flashButton(buyClickBtn);
-  }
-});
-
 function flashButton(el){
+  if (!el) return;
   el.style.transform = "translateY(-4px)";
   el.style.boxShadow = "0 8px 22px rgba(255,0,80,0.08)";
   setTimeout(()=> { el.style.transform=""; el.style.boxShadow=""; }, 220);
 }
 
 // initial render
+renderBuildings();
 refreshUI();
 </script>
 </body>
 </html>
+
