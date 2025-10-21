@@ -7,10 +7,8 @@
 
 <style>
   :root{
-    --bg1: #0f1724;
-    --bg2: #102a43;
-    --card: rgba(255,255,255,0.06);
-    --accent: linear-gradient(135deg,#ffd36b,#ff8ab6);
+    --bg1: rgba(15,23,36,0.72);
+    --bg2: rgba(16,42,67,0.72);
     --glass: rgba(255,255,255,0.04);
     --glass-2: rgba(255,255,255,0.02);
     --glass-border: rgba(255,255,255,0.06);
@@ -18,12 +16,19 @@
     --glass-radius: 14px;
   }
 
-  /* Page */
+  /* Reset & base */
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
   body{
-    background: radial-gradient(1200px 600px at 10% 10%, rgba(255,138,182,0.06), transparent 8%),
-                linear-gradient(180deg,var(--bg1),var(--bg2));
+    /* Background image (SpaceBackground.jfif) with dark gradient overlay for contrast */
+    background:
+      radial-gradient(1200px 600px at 10% 10%, rgba(255,138,182,0.06), transparent 8%),
+      linear-gradient(180deg, var(--bg1), var(--bg2)),
+      url('SpaceBackground.jfif');
+    background-blend-mode: overlay, overlay, normal;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     color:#e6eef8;
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
@@ -43,7 +48,7 @@
     align-items:flex-start;
   }
 
-  /* Left panel - info & upgrades */
+  /* Panel common */
   .panel{
     background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
     border:1px solid var(--glass-border);
@@ -53,6 +58,7 @@
     box-shadow: 0 8px 30px rgba(2,6,23,0.6);
   }
 
+  /* Left panel */
   #leftPanel{
     width:340px;
     display:flex;
@@ -99,7 +105,7 @@
   }
   .meta strong{display:block;font-size:15px;color:#fff}
 
-  /* Upgrades area */
+  /* Upgrades */
   #upgrades{
     margin-top:12px;
     display:flex;
@@ -141,7 +147,7 @@
   }
   .cost {font-size:13px;color:var(--muted);margin-top:6px}
 
-  /* Right panel - big star */
+  /* Right panel */
   #rightPanel{
     display:flex;
     flex-direction:column;
@@ -264,7 +270,7 @@
         </div>
       </div>
 
-      <div class="hint">Tip: you can play this on GitHub Pages — just drop <code>StarClickMain.png</code> and this file into your repo.</div>
+      <div class="hint">Tip: put <code>StarClickMain.png</code> and <code>SpaceBackground.jfif</code> next to this file in your repo to make it work on GitHub Pages.</div>
     </div>
 
     <!-- RIGHT: big clickable star -->
@@ -288,16 +294,15 @@
 
 <script>
 /* BoringClicker - single-file prototype
-   Place StarClickMain.png next to this file in the repo root.
-   Small, modular logic with comments.
+   Place StarClickMain.png and SpaceBackground.jfif next to this file in the repo root.
 */
 
 let cookies = 0;             // total current cookies
 let sessionCookies = 0;      // session collected count
 let cookiesPerClick = 1;     // CPC (cookies gained per click)
 let autoCount = 0;           // number of auto clickers (each gives autoPower CPS)
-const autoPower = 1;        // each auto gives 1 CPS
-const basePassiveCPS = 0.2; // small passive CPS (to keep the feel from earlier auto every 5s)
+const autoPower = 1;         // each auto gives 1 CPS
+const basePassiveCPS = 0.2;  // small passive CPS
 
 const totalEl = document.getElementById('totalCookies');
 const metaTotal = document.getElementById('metaTotal');
@@ -311,7 +316,7 @@ const buyClickBtn = document.getElementById('buyClick');
 const autoOwnedEl = document.getElementById('autoOwned');
 const clickLevelEl = document.getElementById('clickLevel');
 
-// helper to format numbers nicely (k = thousand, m = million)
+// pretty number formatting
 function pretty(n){
   if (n >= 1_000_000_000) return (n/1_000_000_000).toFixed(2) + 'b';
   if (n >= 1_000_000) return (n/1_000_000).toFixed(2) + 'm';
@@ -324,7 +329,7 @@ function getCPS(){
   return basePassiveCPS + (autoCount * autoPower);
 }
 
-// update any DOM numbers
+// update UI
 function refreshUI(){
   totalEl.textContent = pretty(cookies);
   metaTotal.textContent = pretty(cookies);
@@ -333,14 +338,12 @@ function refreshUI(){
   cpcEl.textContent = cookiesPerClick;
   autoOwnedEl.textContent = autoCount;
   clickLevelEl.textContent = cookiesPerClick;
-  // mark buy buttons as buyable or not
   buyAutoBtn.classList.toggle('buyable', cookies >= 10);
   buyClickBtn.classList.toggle('buyable', cookies >= 25);
 }
 
-// click the star
+// click handler
 btn.addEventListener('click', (e) => {
-  // visual click pop (tiny)
   btn.style.transform = "scale(0.96)";
   setTimeout(()=> btn.style.transform = "", 90);
 
@@ -349,18 +352,17 @@ btn.addEventListener('click', (e) => {
   refreshUI();
 });
 
-// passive CPS adds cookies every second
+// passive CPS (per second)
 setInterval(() => {
   const cps = getCPS();
-  // add cps each second (allow fractional CPS accumulation)
   cookies += cps;
   sessionCookies += cps;
   refreshUI();
 }, 1000);
 
-// buy an auto clicker
+// buy auto
 buyAutoBtn.addEventListener('click', () => {
-  const cost = 10 + Math.floor(autoCount * 5); // rising cost
+  const cost = 10 + Math.floor(autoCount * 5);
   if (cookies >= cost){
     cookies -= cost;
     autoCount += 1;
@@ -370,7 +372,7 @@ buyAutoBtn.addEventListener('click', () => {
   }
 });
 
-// upgrade click strength
+// upgrade click
 buyClickBtn.addEventListener('click', () => {
   const cost = 25 + (cookiesPerClick-1) * 25;
   if (cookies >= cost){
@@ -388,7 +390,7 @@ function flashButton(el){
   setTimeout(()=> { el.style.transform=""; el.style.boxShadow=""; }, 220);
 }
 
-// initial refresh
+// initial render
 refreshUI();
 </script>
 </body>
