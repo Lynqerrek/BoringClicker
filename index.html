@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>BoringClicker</title>
 <style>
   :root{
@@ -28,13 +28,37 @@
     background-repeat: no-repeat;
     color:#e6eef8;
     display:flex;
-    align-items:center;
+    align-items:flex-start;
     justify-content:center;
-    padding:36px;
+    padding:18px;
     min-height:100vh;
+    gap:12px;
   }
 
-  /* Top settings button */
+  /* TOP BAR (export/import code) */
+  #topBar{
+    position:fixed;
+    top:10px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:10001;
+    width:88%;
+    max-width:1200px;
+    display:flex;
+    gap:8px;
+    align-items:center;
+    padding:10px 12px;
+    background: rgba(4,12,24,0.6);
+    border:1px solid rgba(255,255,255,0.04);
+    border-radius:12px;
+    backdrop-filter: blur(6px);
+  }
+  #exportCode{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaf2ff}
+  #importInput{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaf2ff}
+  .topBtn{padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaf2ff;cursor:pointer;font-weight:700}
+  .topBtn.positive{background:var(--buy-active);color:#082032;border:none}
+
+  /* Settings button (top-right) */
   #settingsBtn{
     position:fixed;
     top:12px;
@@ -64,98 +88,51 @@
     gap:18px;
     color:#eaf2ff;
   }
-  #loadingBox{
-    width:520px;
-    max-width:90%;
-    padding:18px;
-    border-radius:12px;
-    background: rgba(255,255,255,0.03);
-    border:1px solid rgba(255,255,255,0.05);
-    text-align:center;
-  }
-  #loadingBarWrap{
-    width:100%;
-    background: rgba(255,255,255,0.03);
-    border-radius:12px;
-    padding:6px;
-    margin-top:12px;
-  }
-  #loadingBar{
-    height:14px;
-    width:0%;
-    border-radius:8px;
-    background: linear-gradient(90deg, var(--accent1), var(--accent2));
-    transition: width 300ms ease;
-  }
+  #loadingBox{width:520px;max-width:90%;padding:18px;border-radius:12px;background: rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);text-align:center}
+  #loadingBarWrap{width:100%;background: rgba(255,255,255,0.03);border-radius:12px;padding:6px;margin-top:12px}
+  #loadingBar{height:14px;width:0%;border-radius:8px;background: linear-gradient(90deg, var(--accent1), var(--accent2));transition: width 300ms ease}
 
   /* Main container */
-  #gameWrap{
+  #main{
     width:100%;
-    max-width:1080px;
+    max-width:1200px;
     display:flex;
-    gap:28px;
+    gap:20px;
     align-items:flex-start;
-    z-index:1;
+    margin-top:70px;
   }
 
-  .panel{
-    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-    border:1px solid var(--glass-border);
-    backdrop-filter: blur(6px);
-    padding:18px;
-    border-radius: var(--glass-radius);
-    box-shadow: 0 8px 30px rgba(2,6,23,0.55);
-  }
+  .panel{background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));border:1px solid var(--glass-border);backdrop-filter: blur(6px);padding:18px;border-radius: var(--glass-radius);box-shadow: 0 8px 30px rgba(2,6,23,0.55);}
 
-  /* Left panel */
-  #leftPanel{
-    width:380px;
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-  }
+  /* Left column */
+  #leftCol{width:420px;display:flex;flex-direction:column;gap:12px}
   .titleRow{display:flex;align-items:center;justify-content:space-between}
-  h1{margin:0;font-size:20px;letter-spacing:0.6px}
+  h1{margin:0;font-size:20px}
   .sub{color:var(--muted);font-size:13px}
-
   #totalCookies{font-size:34px;margin-top:6px;font-weight:700;color:#fff;text-shadow: 0 6px 18px rgba(0,0,0,0.6);}
 
   .metaRow{display:flex;gap:10px;margin-top:6px}
   .meta{background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border: 1px solid rgba(255,255,255,0.03);padding:10px 12px;border-radius:10px;font-size:13px;min-width:120px;text-align:left}
   .meta strong{display:block;font-size:15px;color:#fff}
 
-  /* Upgrades area */
-  #upgrades{display:flex;flex-direction:column;gap:8px;margin-top:6px}
-  .upgrade{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.015)}
-  .upgrade .left{display:flex;flex-direction:column}
-  .upgrade .name{font-weight:800}
-  .upgrade .desc{font-size:12px;color:var(--muted)}
-  .upgrade button{background:transparent;border:1px solid rgba(255,255,255,0.08);color:#fff;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:700}
-  .upgrade button.buyable{background:var(--buy-active);color:#082032;border:none;box-shadow:0 6px 22px rgba(255,138,182,0.12)}
+  /* Upgrades list */
+  #upgradesList{display:flex;flex-direction:column;gap:8px;margin-top:6px;max-height:260px;overflow:auto;padding-right:8px}
+  .upgradeItem{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.015)}
+  .upgradeItem .left{display:flex;flex-direction:column}
+  .upgradeItem .name{font-weight:800}
+  .upgradeItem .desc{font-size:12px;color:var(--muted)}
+  .upgradeItem button{padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaf2ff;cursor:pointer}
+  .upgradeItem button.bought{background:rgba(255,255,255,0.06);color:var(--muted);cursor:default;border:none}
 
-  /* Multibuy control */
+  /* Multi-buy */
   #multiBuyWrap{display:flex;gap:8px;align-items:center;margin-top:8px}
   .multiBtn{padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaf2ff;cursor:pointer;font-weight:700}
   .multiBtn.active{background:var(--buy-active);color:#082032;border:none;box-shadow:0 6px 22px rgba(255,138,182,0.06)}
 
-  /* Buildings list - scrollable + styled scrollbar */
-  #buildingsWrap{margin-top:10px}
-  #buildingsList{
-    margin-top:6px;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    max-height:320px;         /* <-- scrollable area */
-    overflow-y:auto;
-    padding-right:8px;
-  }
-  /* custom scrollbar */
-  #buildingsList::-webkit-scrollbar{width:10px}
-  #buildingsList::-webkit-scrollbar-track{background:transparent}
+  /* Buildings */
+  #buildingsList{margin-top:6px;display:flex;flex-direction:column;gap:10px;max-height:420px;overflow-y:auto;padding-right:8px}
+  #buildingsList::-webkit-scrollbar{width:10px} #buildingsList::-webkit-scrollbar-track{background:transparent}
   #buildingsList::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border-radius:10px;border:2px solid transparent;background-clip:padding-box}
-  /* firefox */
-  #buildingsList{scrollbar-width:thin;scrollbar-color: rgba(255,255,255,0.06) transparent}
-
   .building{display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.015);gap:10px}
   .b-left{display:flex;gap:10px;align-items:center}
   .b-icon{width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#082032;box-shadow:0 6px 18px rgba(255,138,182,0.08)}
@@ -167,20 +144,17 @@
   .buyBtn{background:transparent;border:1px solid rgba(255,255,255,0.08);color:#fff;padding:6px 10px;border-radius:10px;cursor:pointer;font-weight:700}
   .buyBtn.buyable{background:var(--buy-active);color:#082032;border:none;box-shadow:0 6px 22px rgba(255,138,182,0.12)}
 
-  /* Right panel */
-  #rightPanel{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;width:100%;max-width:660px}
-  #starCard{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 28px;border-radius:18px;background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 40px rgba(2,6,23,0.55)}
+  /* Right column */
+  #rightCol{flex:1;display:flex;flex-direction:column;gap:12px}
+  #starCard{display:flex;flex-direction:column;align-items:center;padding:20px;border-radius:18px;background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 40px rgba(2,6,23,0.55)}
   #starName{font-weight:800;margin-bottom:10px;color:#fff}
-  #cookieBtn{width:260px;max-width:60%;cursor:pointer;user-select:none;transform-origin:center;transition: transform .12s ease, filter .12s ease}
+  #cookieBtn{width:280px;max-width:60%;cursor:pointer;user-select:none;transform-origin:center;transition: transform .12s ease, filter .12s ease}
   #cookieBtn:hover{ transform:translateY(-6px) rotate(-2deg) }
   #cookieBtn:active{ transform:scale(.94) rotate(0deg) }
-
   #starStats{margin-top:14px;display:flex;gap:18px;align-items:center;justify-content:center}
   .stat{text-align:center;padding:8px 14px;border-radius:12px;background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);min-width:140px}
   .stat .label{ font-size:12px; color:var(--muted); }
   .stat .value{ margin-top:6px; font-size:18px; font-weight:800; color:#fff}
-
-  .hint{margin-top:12px;text-align:center;color:var(--muted);font-size:13px}
 
   /* Settings modal */
   #settingsModal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:99999}
@@ -191,24 +165,33 @@
   input[type="range"]{width:100%}
   input[type="text"]{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaf2ff}
 
-  /* Wipe confirm popup */
+  /* Confirm wipe */
   #confirmWipe{display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:100000}
   #confirmCard{background:#071025;padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);width:360px;text-align:center}
   #confirmCard button{margin:8px;padding:8px 12px;border-radius:8px}
 
-  @media (max-width:920px){
-    #gameWrap{flex-direction:column;align-items:center}
-    #leftPanel{width:100%;max-width:680px}
-    #rightPanel{width:100%}
+  @media (max-width:1100px){
+    body{padding:12px}
+    #topBar{width:95%}
+    #main{flex-direction:column;align-items:center;margin-top:120px}
+    #leftCol{width:100%;max-width:760px}
+    #rightCol{width:100%}
     #cookieBtn{width:220px}
-    #buildingsList{max-height:260px}
   }
 </style>
 </head>
 <body>
+  <!-- TOP BAR: export / import code -->
+  <div id="topBar">
+    <input id="exportCode" readonly aria-label="Export code" title="Copy/export code (share to other device)">
+    <button id="copyCodeBtn" class="topBtn">Copy code</button>
+    <input id="importInput" placeholder="Paste import code here..." aria-label="Import code">
+    <button id="importBtn" class="topBtn">Load code</button>
+  </div>
+
   <button id="settingsBtn" aria-haspopup="dialog">⚙ Settings</button>
 
-  <!-- Loading overlay -->
+  <!-- Loading -->
   <div id="loadingOverlay" role="status" aria-live="polite">
     <div id="loadingBox">
       <div style="font-size:20px;font-weight:800">BoringClicker</div>
@@ -218,11 +201,11 @@
     </div>
   </div>
 
-  <!-- Settings modal -->
+  <!-- Settings Modal -->
   <div id="settingsModal" role="dialog" aria-modal="true" aria-hidden="true">
     <div id="settingsCard" class="panel">
       <h3>Settings</h3>
-      <div style="font-size:13px;color:var(--muted)">Adjust sound volume and rename your StarCollector. You can also save or wipe progress here.</div>
+      <div style="font-size:13px;color:var(--muted)">Adjust sound volume and rename your StarCollector. Save/export options below.</div>
 
       <div class="row" style="margin-top:12px">
         <label for="volumeRange">Sound Volume</label>
@@ -242,7 +225,7 @@
     </div>
   </div>
 
-  <!-- Confirm wipe -->
+  <!-- Confirm Wipe -->
   <div id="confirmWipe" role="dialog" aria-modal="true">
     <div id="confirmCard">
       <div style="font-weight:800;font-size:16px;margin-bottom:8px">Confirm wipe</div>
@@ -254,190 +237,157 @@
     </div>
   </div>
 
-  <!-- Main game (hidden until loaded) -->
-  <div id="gameWrap" style="visibility:hidden;opacity:0;transition:opacity .4s ease">
-    <!-- LEFT -->
-    <div id="leftPanel" class="panel">
-      <div class="titleRow">
-        <div>
-          <h1>BoringClicker</h1>
-          <div class="sub">Buy space things — produce cookies per second</div>
-        </div>
-        <div class="sub" style="text-align:right">v1.6</div>
-      </div>
-
-      <div id="totalCookies">0</div>
-
-      <div class="metaRow">
-        <div class="meta">
-          <div class="label">Cookies</div>
-          <strong id="metaTotal">0</strong>
-          <div class="cost">Available cookies</div>
-        </div>
-        <div class="meta">
-          <div class="label">Session</div>
-          <strong id="metaSession">0</strong>
-          <div class="cost">This session</div>
-        </div>
-      </div>
-
-      <!-- Upgrades -->
-      <div style="margin-top:8px">
-        <div class="sub" style="margin-bottom:6px">Upgrades</div>
-        <div id="upgrades" aria-live="polite">
-          <!-- Click upgrade -->
-          <div class="upgrade">
-            <div class="left">
-              <div class="name">Upgrade Click</div>
-              <div class="desc">Increase cookies per click by +1 (very expensive, scales fast)</div>
-            </div>
-            <div>
-              <button id="buyClickUpgrade">Buy</button>
-            </div>
+  <!-- Main -->
+  <div id="main">
+    <div id="leftCol">
+      <div class="panel">
+        <div class="titleRow">
+          <div>
+            <h1>BoringClicker</h1>
+            <div class="sub">Buy space things — produce cookies per second</div>
           </div>
-
-          <!-- Building efficiency -->
-          <div class="upgrade">
-            <div class="left">
-              <div class="name">Building Efficiency</div>
-              <div class="desc">Increase all building CPS by +10% per level</div>
-            </div>
-            <div>
-              <button id="buyEffUpgrade">Buy</button>
-            </div>
-          </div>
+          <div class="sub" style="text-align:right">v1.6+</div>
         </div>
-      </div>
 
-      <!-- Multibuy controls -->
-      <div id="multiBuyWrap">
-        <div class="sub">Buy amount:</div>
-        <button class="multiBtn active" data-mult="1">x1</button>
-        <button class="multiBtn" data-mult="10">x10</button>
-        <button class="multiBtn" data-mult="100">x100</button>
-        <button class="multiBtn" data-mult="max">Max</button>
-      </div>
+        <div id="totalCookies">0</div>
 
-      <!-- Buildings (scrollable) -->
-      <div id="buildingsWrap">
-        <div class="sub" style="margin-top:10px">Buildings</div>
-        <div id="buildingsList" role="list"></div>
-      </div>
+        <div class="metaRow">
+          <div class="meta"><div class="label">Cookies</div><strong id="metaTotal">0</strong><div class="cost">Available cookies</div></div>
+          <div class="meta"><div class="label">Session</div><strong id="metaSession">0</strong><div class="cost">This session</div></div>
+        </div>
 
-      <div class="hint">Put <code>StarClickMain.png</code>, <code>SpaceBackground.jfif</code> and <code>ClickSound.mp3</code> beside this file in your repo.</div>
+        <div style="margin-top:8px">
+          <div class="sub" style="margin-bottom:6px">Upgrades (one-time)</div>
+          <div id="upgradesList" aria-live="polite"></div>
+        </div>
+
+        <div id="multiBuyWrap"><div class="sub">Buy amount:</div>
+          <button class="multiBtn active" data-mult="1">x1</button>
+          <button class="multiBtn" data-mult="10">x10</button>
+          <button class="multiBtn" data-mult="100">x100</button>
+          <button class="multiBtn" data-mult="max">Max</button>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="sub" style="margin-bottom:6px">Buildings</div>
+          <div id="buildingsList" role="list"></div>
+        </div>
+
+        <div style="margin-top:10px;color:var(--muted);font-size:13px">Tip: Use the export code above to move progress between devices.</div>
+      </div>
     </div>
 
-    <!-- RIGHT -->
-    <div id="rightPanel">
+    <div id="rightCol">
       <div id="starCard" class="panel">
         <div id="starName">StarCollector</div>
         <img id="cookieBtn" src="StarClickMain.png" alt="StarClickMain" draggable="false">
       </div>
 
       <div id="starStats">
-        <div class="stat">
-          <div class="label">Cookies / second</div>
-          <div class="value" id="cpsValue">0</div>
-        </div>
-        <div class="stat">
-          <div class="label">Cookies / click</div>
-          <div class="value" id="cpcValue">1</div>
-        </div>
+        <div class="stat"><div class="label">Cookies / second</div><div class="value" id="cpsValue">0</div></div>
+        <div class="stat"><div class="label">Cookies / click</div><div class="value" id="cpcValue">1</div></div>
       </div>
     </div>
   </div>
 
 <script>
-/* BoringClicker v1.6
- - Added save/load (localStorage), autosave, Save Now button
- - Added Wipe Save with confirmation modal
- - Added multibuy (x1, x10, x100, Max)
- - Keeps features: loading screen, rate-limited click sound, settings volume, rename, scrollable buildings.
+/* BoringClicker — v1.6+ (upgrades + export/import code)
+   - New: many one-time upgrades (balanced)
+   - Export code (copy at top) — base64 JSON string of save (cookies, upgrades, buildings, settings)
+   - Import paste field at top (Load code) — overwrites current save after confirm
+   - Save/load (localStorage), autosave, wipe with confirm
+   - Multibuy buttons, rate-limited click sounds, settings modal
 */
 
-// SAVE key
-const SAVE_KEY = 'bc_save_v1';
+// ---------- CONFIG & SAVE KEYS ----------
+const SAVE_KEY = 'bc_save_v2';
+const LS_VOLUME = 'bc_volume_v2';
+const LS_NAME = 'bc_name_v2';
 
 // ---------- ASSETS LOADING ----------
-const assets = ['StarClickMain.png', 'SpaceBackground.jfif', 'ClickSound.mp3'];
+const assets = ['StarClickMain.png','SpaceBackground.jfif','ClickSound.mp3'];
 let assetsLoaded = 0;
 const loadingOverlay = document.getElementById('loadingOverlay');
 const loadingBar = document.getElementById('loadingBar');
 const loadingPercent = document.getElementById('loadingPercent');
-const gameWrap = document.getElementById('gameWrap');
+const gameWrap = document.getElementById('main');
 
-// AUDIO preload
 let clickAudio = new Audio('ClickSound.mp3');
 clickAudio.preload = 'auto';
 clickAudio.crossOrigin = 'anonymous';
-clickAudio.addEventListener('canplaythrough', () => { assetsLoaded++; updateLoadingProgress(); revealIfReady(); }, { once: true });
-clickAudio.addEventListener('error', () => { console.warn('Click sound failed to load'); assetsLoaded++; updateLoadingProgress(); revealIfReady(); }, { once: true });
+clickAudio.addEventListener('canplaythrough', ()=>{ assetsLoaded++; updateLoadingProgress(); revealIfReady(); }, { once:true });
+clickAudio.addEventListener('error', ()=>{ assetsLoaded++; updateLoadingProgress(); revealIfReady(); }, { once:true });
 
-// preload images
-assets.filter(a => a.endsWith('.png') || a.endsWith('.jfif')).forEach(src => {
+assets.filter(a => a.endsWith('.png') || a.endsWith('.jfif')).forEach(src=>{
   const img = new Image();
   img.src = src;
-  img.onload = () => { assetsLoaded++; updateLoadingProgress(); revealIfReady(); };
-  img.onerror = () => { console.warn('Asset failed:', src); assetsLoaded++; updateLoadingProgress(); revealIfReady(); };
+  img.onload = ()=>{ assetsLoaded++; updateLoadingProgress(); revealIfReady(); };
+  img.onerror = ()=>{ assetsLoaded++; updateLoadingProgress(); revealIfReady(); };
 });
-function updateLoadingProgress(){
-  const pct = Math.round((assetsLoaded / assets.length) * 100);
-  loadingBar.style.width = pct + '%';
-  loadingPercent.textContent = pct + '%';
-}
+function updateLoadingProgress(){ const pct = Math.round((assetsLoaded / assets.length) * 100); loadingBar.style.width = pct + '%'; loadingPercent.textContent = pct + '%'; }
 function revealIfReady(){
   if (assetsLoaded >= assets.length){
-    // Load saved game before revealing UI so we show restored state immediately
-    loadGame(); // attempt load (safe if no save)
-    setTimeout(()=> {
-      loadingOverlay.style.transition = 'opacity .4s ease';
-      loadingOverlay.style.opacity = 0;
-      setTimeout(()=> loadingOverlay.remove(), 420);
-      gameWrap.style.visibility = 'visible';
-      gameWrap.style.opacity = '1';
-      refreshUI(); // ensure UI reflects loaded state
-    }, 300);
+    // load saved game before revealing UI
+    loadGame();
+    setTimeout(()=>{ loadingOverlay.style.opacity=0; setTimeout(()=>loadingOverlay.remove(),420); gameWrap.style.visibility='visible'; refreshUI(); generateExportCode(); }, 300);
   }
 }
-setTimeout(()=> {
-  if (assetsLoaded < assets.length){
-    assetsLoaded = Math.min(assets.length, assetsLoaded + 1);
-    updateLoadingProgress();
-    revealIfReady();
-  }
-}, 2000);
+setTimeout(()=>{ if (assetsLoaded < assets.length) { assetsLoaded = Math.min(assets.length, assetsLoaded+1); updateLoadingProgress(); revealIfReady(); } }, 2000);
 
-// ---------- GAME STATE ----------
+/* ---------- GAME STATE ---------- */
 let cookies = 0;
 let sessionCookies = 0;
-let cookiesPerClick = 1; // initial CPC
+let cookiesPerClick = 1;
 let clickUpgradeLevel = 0;
 let effUpgradeLevel = 0;
 
-// buildings initial definitions (from your list)
+// extra system variables affected by upgrades
+let buildingMultiplier = 1.0;   // multiplies building CPS
+let costMultiplier = 1.0;       // multiplies base building cost
+let globalCPSBonus = 0;         // flat CPS added
+let globalCookieMultiplier = 1.0; // multiplies final cookie gains (not used for purchases)
+
+// BUILDINGS — easy to add via initialBuildings array
 const initialBuildings = [
-  { id: 'telescope', name: 'Telescope', baseCost: 15,           baseCPS: 0.1,    desc: 'Basic science: small CPS' },
-  { id: 'space_rocket', name: 'Space Rocket', baseCost: 200,    baseCPS: 1.25,   desc: 'Rockets launching probes' },
-  { id: 'satellite', name: 'Satellite', baseCost: 1100,         baseCPS: 9,      desc: 'Orbiting machines, steady income' },
-  { id: 'space_station', name: 'Space Station', baseCost: 12000, baseCPS: 48,     desc: 'Big orbital platform' },
-  { id: 'solar_probe', name: 'Solar Probe', baseCost: 130000,   baseCPS: 270,    desc: 'Expensive probes near stars' },
-  { id: 'tiny_planet', name: 'Tiny Planet', baseCost: 1_400_000, baseCPS: 1450, desc: 'Small artificial world' },
-  { id: 'gas_giant', name: 'Gas Giant', baseCost: 20_000_000,    baseCPS: 7800, desc: 'Huge yields but very expensive' },
-  { id: 'alien_megaplanet', name: 'Alien MegaPlanet', baseCost: 330_000_000, baseCPS: 44000, desc: 'Mega investment: massive CPS' }
+  { id:'telescope', name:'Telescope', baseCost:15, baseCPS:0.1, desc:'Basic science: small CPS' },
+  { id:'space_rocket', name:'Space Rocket', baseCost:200, baseCPS:1.25, desc:'Rockets launching probes' },
+  { id:'satellite', name:'Satellite', baseCost:1100, baseCPS:9, desc:'Orbiting machines, steady income' },
+  { id:'space_station', name:'Space Station', baseCost:12000, baseCPS:48, desc:'Big orbital platform' },
+  { id:'solar_probe', name:'Solar Probe', baseCost:130000, baseCPS:270, desc:'Expensive probes near stars' },
+  { id:'tiny_planet', name:'Tiny Planet', baseCost:1400000, baseCPS:1450, desc:'Small artificial world' },
+  { id:'gas_giant', name:'Gas Giant', baseCost:20000000, baseCPS:7800, desc:'Huge yields but very expensive' },
+  { id:'alien_megaplanet', name:'Alien MegaPlanet', baseCost:330000000, baseCPS:44000, desc:'Mega investment: massive CPS' }
 ];
 
 let buildingDefs = [];
-const buildingsState = {}; // {id: {owned: number}}
+const buildingsState = {}; // each: {owned}
 
-// register helper
-function registerBuilding(def){
-  if (!def || !def.id) throw new Error('Invalid building def');
-  buildingDefs.push(Object.assign({}, def));
-  buildingsState[def.id] = buildingsState[def.id] || { owned: 0 };
-}
-initialBuildings.forEach(b => registerBuilding(b));
+function registerBuilding(def){ buildingDefs.push(Object.assign({},def)); buildingsState[def.id] = buildingsState[def.id] || {owned:0}; }
+initialBuildings.forEach(b=>registerBuilding(b));
 
-// ---------- UI refs ----------
+// UPGRADES (one-time purchases, not OP)
+// Each upgrade has id,name,desc,cost,apply(state) which applies its effect when bought
+const upgradesDefs = [
+  { id:'u_click_1', name:'Click +1', desc:'+1 cookies per click', cost:500, apply:()=> { cookiesPerClick += 1; } },
+  { id:'u_click_5', name:'Click +5', desc:'+5 cookies per click', cost:2500, apply:()=> { cookiesPerClick += 5; } },
+  { id:'u_click_double', name:'Click Doubler', desc:'Double your cookies-per-click', cost:20000, apply:()=> { cookiesPerClick = Math.round(cookiesPerClick * 2); } },
+  { id:'u_build_10', name:'Engine Tuning', desc:'+10% building CPS', cost:10000, apply:()=> { buildingMultiplier += 0.10; } },
+  { id:'u_build_50', name:'Quantum Efficiency', desc:'+50% building CPS', cost:75000, apply:()=> { buildingMultiplier += 0.50; } },
+  { id:'u_auto_2', name:'Auto Core', desc:'+2 flat CPS (always on)', cost:12000, apply:()=> { globalCPSBonus += 2; } },
+  { id:'u_global_5', name:'Harvest Protocol', desc:'+5% overall cookie gain', cost:30000, apply:()=> { globalCookieMultiplier *= 1.05; } },
+  { id:'u_cost_down', name:'Manufacturing Discount', desc:'-7% building base cost', cost:20000, apply:()=> { costMultiplier *= 0.93; } },
+  { id:'u_build_special', name:'Advanced Modules', desc:'+20% CPS for small buildings', cost:50000, apply:()=> { /* special: boost telescopes & rockets */ 
+      buildingDefs.forEach(d=>{ if (d.id==='telescope'||d.id==='space_rocket') d.baseCPS = d.baseCPS * 1.2; });
+    } 
+  },
+  { id:'u_click_small', name:'Finger Training', desc:'+2 cookies per click', cost:6000, apply:()=> { cookiesPerClick += 2; } },
+  { id:'u_mini_boost', name:'Micro Boost', desc:'+200 cookies (one-time bonus)', cost:15000, apply:()=> { cookies += 200; } },
+  { id:'u_build_multi', name:'Structural Upgrade', desc:'+15% building CPS', cost:40000, apply:()=> { buildingMultiplier += 0.15; } }
+];
+// purchased set
+const purchasedUpgrades = new Set();
+
+// ---------- UI Refs ----------
 const totalEl = document.getElementById('totalCookies');
 const metaTotal = document.getElementById('metaTotal');
 const metaSession = document.getElementById('metaSession');
@@ -445,7 +395,12 @@ const cpsEl = document.getElementById('cpsValue');
 const cpcEl = document.getElementById('cpcValue');
 const btn = document.getElementById('cookieBtn');
 const buildingsList = document.getElementById('buildingsList');
+const upgradesListEl = document.getElementById('upgradesList');
 const starNameEl = document.getElementById('starName');
+const exportCodeInput = document.getElementById('exportCode');
+const copyCodeBtn = document.getElementById('copyCodeBtn');
+const importInput = document.getElementById('importInput');
+const importBtn = document.getElementById('importBtn');
 
 const buyClickUpgradeBtn = document.getElementById('buyClickUpgrade');
 const buyEffUpgradeBtn = document.getElementById('buyEffUpgrade');
@@ -455,82 +410,54 @@ const settingsModal = document.getElementById('settingsModal');
 const settingsClose = document.getElementById('settingsClose');
 const volumeRange = document.getElementById('volumeRange');
 const nameInput = document.getElementById('nameInput');
-
 const saveNowBtn = document.getElementById('saveNow');
 const wipeBtn = document.getElementById('wipeBtn');
 const confirmWipe = document.getElementById('confirmWipe');
 const confirmWipeYes = document.getElementById('confirmWipeYes');
 const confirmWipeNo = document.getElementById('confirmWipeNo');
 
-// multibuy buttons
-let multiBuy = 1; // 1,10,100 or 'max'
+let multiBuy = 1;
 document.querySelectorAll('.multiBtn').forEach(b=>{
-  b.addEventListener('click', ()=> {
-    document.querySelectorAll('.multiBtn').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active');
-    const v = b.dataset.mult;
-    multiBuy = (v === 'max') ? 'max' : Number(v);
-  });
+  b.addEventListener('click', ()=>{ document.querySelectorAll('.multiBtn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); const v = b.dataset.mult; multiBuy = (v==='max')? 'max' : Number(v); });
 });
 
-// ---------- settings persistence ----------
-const LS_VOLUME = 'bc_volume_v1';
-const LS_NAME = 'bc_name_v1';
+// ---------- SETTINGS & PERSISTENT VALUES ----------
 let volume = Number(localStorage.getItem(LS_VOLUME) ?? 80) / 100;
 let starName = localStorage.getItem(LS_NAME) ?? 'StarCollector';
-volumeRange.value = Math.round(volume * 100);
+volumeRange.value = Math.round(volume*100);
 nameInput.value = starName;
 starNameEl.textContent = starName;
 
-volumeRange.addEventListener('input', (e) => {
-  volume = Number(e.target.value) / 100;
-  localStorage.setItem(LS_VOLUME, Math.round(volume * 100));
-  clickAudio.volume = volume;
-});
-nameInput.addEventListener('input', (e) => {
-  const val = e.target.value.slice(0, 20);
-  starName = val || 'StarCollector';
-  starNameEl.textContent = starName;
-  localStorage.setItem(LS_NAME, starName);
-});
-settingsBtn.addEventListener('click', () => {
-  settingsModal.style.display = 'flex';
-  settingsModal.setAttribute('aria-hidden','false');
-});
-settingsClose.addEventListener('click', () => {
-  settingsModal.style.display = 'none';
-  settingsModal.setAttribute('aria-hidden','true');
-});
+volumeRange.addEventListener('input',(e)=>{ volume = Number(e.target.value)/100; localStorage.setItem(LS_VOLUME, Math.round(volume*100)); clickAudio.volume = volume; generateExportCode(); saveGame(); });
+nameInput.addEventListener('input',(e)=>{ starName = e.target.value.slice(0,20) || 'StarCollector'; starNameEl.textContent = starName; localStorage.setItem(LS_NAME, starName); generateExportCode(); saveGame(); });
+settingsBtn.addEventListener('click', ()=>{ settingsModal.style.display='flex'; settingsModal.setAttribute('aria-hidden','false'); });
+settingsClose.addEventListener('click', ()=>{ settingsModal.style.display='none'; settingsModal.setAttribute('aria-hidden','true'); });
 
-// ---------- number formatting ----------
+// ---------- NUMBER FORMATTING ----------
 function formatNumber(n){
   if (!isFinite(n)) return '0';
   const abs = Math.abs(n);
   if (abs < 1000) return Math.floor(n).toString();
   if (abs < 1e6) return Math.floor(n).toLocaleString();
   const millions = n / 1e6;
-  if (millions < 1000){
-    const rounded = Math.round(millions * 100) / 100;
-    return (Number.isInteger(rounded) ? rounded.toLocaleString() : rounded.toFixed(2)) + ' million';
-  }
+  if (millions < 1000){ const rounded = Math.round(millions*100)/100; return (Number.isInteger(rounded) ? rounded.toLocaleString() : rounded.toFixed(2)) + ' million'; }
   const roundedMillions = Math.round(millions);
   return roundedMillions.toLocaleString() + ' million';
 }
 
-// ---------- game formulas ----------
+// ---------- FORMULAS ----------
 const COST_SCALE = 1.17;
-function getBuildingCost(def, owned){ return Math.ceil(def.baseCost * Math.pow(COST_SCALE, owned)); }
+function getBuildingCost(def, owned){ return Math.ceil(def.baseCost * costMultiplier * Math.pow(COST_SCALE, owned)); }
 function getClickUpgradeCost(level){ return Math.ceil(8000 * Math.pow(3.2, level)); }
 function getEffUpgradeCost(level){ return Math.ceil(25000 * Math.pow(2.8, level)); }
 function getBuildingCPS(){
   let total = 0;
-  for (const def of buildingDefs) total += buildingsState[def.id].owned * def.baseCPS;
-  const multiplier = 1 + 0.1 * effUpgradeLevel;
-  return total * multiplier;
+  for (const d of buildingDefs) total += buildingsState[d.id].owned * d.baseCPS;
+  return total * buildingMultiplier + globalCPSBonus;
 }
 function getCPS(){ return getBuildingCPS(); }
 
-// ---------- audio rate limiter ----------
+// ---------- AUDIO RATE LIMITER ----------
 let soundTimestamps = [];
 clickAudio.volume = volume;
 clickAudio.loop = false;
@@ -541,78 +468,53 @@ function getMaxSoundsPerSecond(){
 }
 function playSound(){
   const now = Date.now();
-  soundTimestamps = soundTimestamps.filter(t => (now - t) <= 1000);
+  soundTimestamps = soundTimestamps.filter(t=> (now - t) <= 1000);
   const maxAllowed = getMaxSoundsPerSecond();
   if (soundTimestamps.length >= maxAllowed) return false;
   soundTimestamps.push(now);
-  try {
-    const a = clickAudio.cloneNode();
-    a.volume = volume;
-    a.play().catch(()=>{});
-  } catch(e){
-    try { clickAudio.currentTime = 0; clickAudio.volume = volume; clickAudio.play().catch(()=>{}); } catch(_) {}
-  }
+  try { const a = clickAudio.cloneNode(); a.volume = volume; a.play().catch(()=>{}); } catch(e){ try { clickAudio.currentTime=0; clickAudio.volume=volume; clickAudio.play().catch(()=>{}); } catch(_){} }
   return true;
 }
 
-// ---------- purchasing helpers (multi-buy) ----------
-// returns total cost for buying n items given current owned count
-function getCostForN(def, owned, n){
-  let total = 0;
-  for (let i=0;i<n;i++){
-    total += getBuildingCost(def, owned + i);
-  }
-  return total;
-}
-// compute max affordable items for a building
-function getMaxAffordable(def, owned, availableCookies){
-  // loop until cannot afford; use a safety cap
-  let n = 0;
-  let cost = 0;
-  const cap = 1_000_000; // unrealistic but safe
-  while(n < cap){
-    const nextCost = getBuildingCost(def, owned + n);
-    if (cost + nextCost <= availableCookies){
-      cost += nextCost;
-      n++;
-    } else break;
-  }
-  return { count: n, cost };
+// ---------- UI RENDER ----------
+function renderUpgrades(){
+  upgradesListEl.innerHTML = '';
+  upgradesDefs.forEach(u=>{
+    const bought = purchasedUpgrades.has(u.id);
+    const item = document.createElement('div'); item.className='upgradeItem';
+    item.innerHTML = `<div class="left"><div class="name">${u.name}</div><div class="desc">${u.desc}</div></div>
+      <div><div style="font-size:13px;color:var(--muted);margin-bottom:6px">${formatNumber(u.cost)}</div>
+      <button ${bought? 'class="bought" disabled': ''} data-id="${u.id}">${bought ? 'Purchased' : 'Buy'}</button></div>`;
+    upgradesListEl.appendChild(item);
+  });
+  upgradesListEl.querySelectorAll('button').forEach(btn=>{
+    const id = btn.dataset.id;
+    btn.addEventListener('click', ()=> buyUpgrade(id, btn));
+  });
 }
 
-// ---------- UI rendering ----------
 function renderBuildings(){
   buildingsList.innerHTML = '';
-  buildingDefs.forEach(def => {
+  buildingDefs.forEach(def=>{
     const state = buildingsState[def.id];
     const cost = getBuildingCost(def, state.owned);
-    const effectivePer = (def.baseCPS * (1 + 0.1 * effUpgradeLevel));
-    const b = document.createElement('div');
-    b.className = 'building';
-    b.innerHTML = `
-      <div class="b-left">
-        <div class="b-icon" aria-hidden="true">${def.name.split(' ').map(s=>s[0]).slice(0,2).join('')}</div>
-        <div class="b-info">
-          <div class="name">${def.name}</div>
-          <div class="desc">${def.desc}</div>
-        </div>
-      </div>
-      <div class="b-right">
-        <div class="b-cost">Cost: <strong>${formatNumber(cost)}</strong></div>
-        <div class="b-cost">Gives: <strong>${Number(effectivePer.toFixed(2))}</strong> CPS each</div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <div style="font-size:13px;color:var(--muted);">Owned: <strong>${state.owned}</strong></div>
-          <button class="buyBtn" data-id="${def.id}" data-cost="${cost}">Buy</button>
-        </div>
-      </div>
-    `;
+    const effectivePer = (def.baseCPS * buildingMultiplier);
+    const b = document.createElement('div'); b.className='building';
+    b.innerHTML = `<div class="b-left"><div class="b-icon">${def.name.split(' ').map(s=>s[0]).slice(0,2).join('')}</div>
+      <div class="b-info"><div class="name">${def.name}</div><div class="desc">${def.desc}</div></div></div>
+      <div class="b-right"><div class="b-cost">Cost: <strong>${formatNumber(cost)}</strong></div>
+      <div class="b-cost">Gives: <strong>${Number(effectivePer.toFixed(2))}</strong> CPS each</div>
+      <div style="display:flex;gap:8px;align-items:center">
+      <div style="font-size:13px;color:var(--muted);">Owned: <strong>${state.owned}</strong></div>
+      <button class="buyBtn" data-id="${def.id}" data-cost="${cost}">Buy</button>
+      </div></div>`;
     buildingsList.appendChild(b);
   });
   document.querySelectorAll('.buyBtn').forEach(btnEl=>{
     const id = btnEl.dataset.id;
     const cost = Number(btnEl.dataset.cost);
     btnEl.classList.toggle('buyable', cookies >= cost);
-    btnEl.onclick = () => attemptBuy(id);
+    btnEl.onclick = ()=> attemptBuy(id);
   });
 }
 
@@ -622,251 +524,233 @@ function refreshUI(){
   metaSession.textContent = formatNumber(Math.floor(sessionCookies));
   cpsEl.textContent = Number(getCPS().toFixed(2));
   cpcEl.textContent = cookiesPerClick;
-
-  const clickCost = getClickUpgradeCost(clickUpgradeLevel);
-  buyClickUpgradeBtn.textContent = `Buy (${formatNumber(clickCost)})`;
-  buyClickUpgradeBtn.classList.toggle('buyable', cookies >= clickCost);
-
-  const effCost = getEffUpgradeCost(effUpgradeLevel);
-  buyEffUpgradeBtn.textContent = `Buy (${formatNumber(effCost)})`;
-  buyEffUpgradeBtn.classList.toggle('buyable', cookies >= effCost);
-
   starNameEl.textContent = starName;
-
+  renderUpgrades();
   renderBuildings();
+  generateExportCode(); // update code live
 }
 
-// ---------- interactions ----------
-btn.addEventListener('click', () => {
-  btn.style.transform = "scale(0.96)";
-  setTimeout(()=> btn.style.transform = "", 120);
-  cookies += cookiesPerClick;
-  sessionCookies += cookiesPerClick;
-  playSound();
-  refreshUI();
-});
-
-// attemptBuy uses multiBuy
+// ---------- PURCHASES & MULTIBUY ----------
+function getCostForN(def, owned, n){
+  let total = 0;
+  for(let i=0;i<n;i++) total += getBuildingCost(def, owned + i);
+  return total;
+}
+function getMaxAffordable(def, owned, available){
+  let n=0, cost=0;
+  const cap = 1000000;
+  while(n < cap){
+    const next = getBuildingCost(def, owned + n);
+    if (cost + next <= available){ cost += next; n++; } else break;
+  }
+  return {count:n, cost};
+}
 function attemptBuy(id){
-  const def = buildingDefs.find(d => d.id === id);
-  if (!def) return;
+  const def = buildingDefs.find(d=>d.id===id);
+  if(!def) return;
   const state = buildingsState[id];
-
-  let want = multiBuy;
-  if (want === 'max'){
-    const mx = getMaxAffordable(def, state.owned, cookies);
-    want = mx.count;
-    if (want <= 0){ flashButton(document.querySelector(`.buyBtn[data-id="${id}"]`)); return; }
-  }
-
-  // ensure want is integer and >0
-  want = Math.max(1, Math.floor(Number(want) || 1));
-  // compute total cost
+  let want = multiBuy === 'max' ? getMaxAffordable(def, state.owned, cookies).count : Number(multiBuy);
+  if (!want || want <= 0){ flashButton(document.querySelector(`.buyBtn[data-id="${id}"]`)); return; }
+  // cap reasonable to avoid infinite loops
+  want = Math.max(1, Math.min(100000, Math.floor(want)));
   const totalCost = getCostForN(def, state.owned, want);
-
-  // if cannot afford all, reduce until affordable (small loop)
-  let affordable = want;
-  while(affordable > 0 && totalCost > cookies){
-    affordable--;
-    // recompute totalCost for affordable
-    // (recompute rather than incremental to keep code simple)
-    // but to avoid heavy loops, break when affordable 0
-    // recompute:
-    if (affordable > 0) {
-      // calculate new cost
-      // (could be optimized, but numbers of iterations small: max 100)
-    } else break;
-    // recalc:
-    const recalculated = getCostForN(def, state.owned, affordable);
-    if (recalculated <= cookies){
-      // set new total and break
-      const newTotal = recalculated;
-      // perform purchase
-      cookies -= newTotal;
-      state.owned += affordable;
-      playSound();
-      refreshUI();
-      saveGame();
-      return;
-    }
-  }
-
-  // if initial totalCost affordable -> buy
   if (totalCost <= cookies){
     cookies -= totalCost;
     state.owned += want;
-    playSound();
-    refreshUI();
-    saveGame();
+    playSound(); refreshUI(); saveGame();
   } else {
-    // if we fell through, try greedily buy as many as possible
+    // try smaller: greedy buy as many as possible
     const mx = getMaxAffordable(def, state.owned, cookies);
     if (mx.count > 0){
       cookies -= mx.cost;
       state.owned += mx.count;
-      playSound();
-      refreshUI();
-      saveGame();
+      playSound(); refreshUI(); saveGame();
     } else {
       flashButton(document.querySelector(`.buyBtn[data-id="${id}"]`));
     }
   }
 }
 
-// upgrades
-buyClickUpgradeBtn.addEventListener('click', () => {
-  const cost = getClickUpgradeCost(clickUpgradeLevel);
-  if (cookies >= cost){
-    cookies -= cost;
-    clickUpgradeLevel += 1;
-    cookiesPerClick += 1;
-    playSound();
-    refreshUI();
-    saveGame();
-  } else flashButton(buyClickUpgradeBtn);
-});
-buyEffUpgradeBtn.addEventListener('click', () => {
-  const cost = getEffUpgradeCost(effUpgradeLevel);
-  if (cookies >= cost){
-    cookies -= cost;
-    effUpgradeLevel += 1;
-    playSound();
-    refreshUI();
-    saveGame();
-  } else flashButton(buyEffUpgradeBtn);
-});
-function flashButton(el){
-  if (!el) return;
-  el.style.transform = "translateY(-4px)";
-  el.style.boxShadow = "0 8px 22px rgba(255,0,80,0.08)";
-  setTimeout(()=> { el.style.transform=""; el.style.boxShadow=""; }, 220);
+// upgrade buy (one-time)
+function buyUpgrade(id, btnEl){
+  const up = upgradesDefs.find(u=>u.id===id);
+  if (!up) return;
+  if (purchasedUpgrades.has(id)){ return; }
+  if (cookies < up.cost){ flashButton(btnEl); return; }
+  cookies -= up.cost;
+  // apply effect
+  try { up.apply(); } catch(e){ console.warn('Upgrade apply error', e); }
+  purchasedUpgrades.add(id);
+  playSound(); refreshUI(); saveGame();
 }
 
-// ---------- passive CPS tick ----------
-setInterval(() => {
+// ---------- CLICK & CPS TICK ----------
+btn.addEventListener('click', ()=>{
+  btn.style.transform = "scale(0.96)";
+  setTimeout(()=> btn.style.transform = "",120);
+  const gain = cookiesPerClick * globalCookieMultiplier;
+  cookies += gain;
+  sessionCookies += gain;
+  playSound(); refreshUI(); saveGame();
+});
+setInterval(()=>{
   const cps = getCPS();
   if (cps > 0){
-    cookies += cps;
-    sessionCookies += cps;
-    // occasional passive sound
+    cookies += cps * globalCookieMultiplier;
+    sessionCookies += cps * globalCookieMultiplier;
     if (cps >= 500) playSound();
-    refreshUI();
+    refreshUI(); saveGame();
   } else refreshUI();
-}, 1000);
+},1000);
 
 // ---------- SAVE / LOAD / WIPE ----------
 function getSaveData(){
   return {
-    version: 1,
-    timestamp: Date.now(),
-    cookies,
-    sessionCookies,
-    cookiesPerClick,
-    clickUpgradeLevel,
-    effUpgradeLevel,
+    version:2,
+    ts:Date.now(),
+    cookies, sessionCookies, cookiesPerClick, clickUpgradeLevel, effUpgradeLevel,
+    buildingMultiplier, costMultiplier, globalCPSBonus, globalCookieMultiplier,
     buildings: Object.fromEntries(Object.entries(buildingsState).map(([k,v])=>[k,v.owned])),
-    settings: { volume: Math.round(volume*100), starName }
+    purchased: Array.from(purchasedUpgrades),
+    settings:{volume:Math.round(volume*100), starName}
   };
 }
 function saveGame(){
-  try {
-    const data = getSaveData();
-    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-    // console.log('Saved.');
-  } catch(e){
-    console.warn('Save failed', e);
-  }
+  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(getSaveData())); generateExportCode(); } catch(e){ console.warn('Save failed', e); }
 }
 function loadGame(){
-  try {
+  try{
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return;
     const data = JSON.parse(raw);
-    // basic validation
-    if (!data || typeof data !== 'object') return;
-    cookies = Number(data.cookies) || 0;
-    sessionCookies = Number(data.sessionCookies) || 0;
+    cookies = Number(data.cookies) || 0; sessionCookies = Number(data.sessionCookies) || 0;
     cookiesPerClick = Number(data.cookiesPerClick) || 1;
     clickUpgradeLevel = Number(data.clickUpgradeLevel) || 0;
     effUpgradeLevel = Number(data.effUpgradeLevel) || 0;
-    // restore buildings
-    if (data.buildings && typeof data.buildings === 'object'){
-      for (const [id, owned] of Object.entries(data.buildings)){
-        if (buildingsState[id]) buildingsState[id].owned = Number(owned) || 0;
-      }
-    }
-    // restore settings volume + name
+    buildingMultiplier = Number(data.buildingMultiplier) || 1.0;
+    costMultiplier = Number(data.costMultiplier) || 1.0;
+    globalCPSBonus = Number(data.globalCPSBonus) || 0;
+    globalCookieMultiplier = Number(data.globalCookieMultiplier) || 1.0;
+    if (data.buildings){ for(const [id, n] of Object.entries(data.buildings)){ if (buildingsState[id]) buildingsState[id].owned = Number(n) || 0; } }
+    purchasedUpgrades.clear();
+    if (Array.isArray(data.purchased)) data.purchased.forEach(id=>purchasedUpgrades.add(id));
     if (data.settings){
-      if (typeof data.settings.volume !== 'undefined') {
-        volume = (Number(data.settings.volume) || 80)/100;
-        localStorage.setItem(LS_VOLUME, Math.round(volume*100));
-        if (typeof volumeRange !== 'undefined') volumeRange.value = Math.round(volume*100);
-      }
-      if (typeof data.settings.starName === 'string'){
-        starName = data.settings.starName || 'StarCollector';
-        localStorage.setItem(LS_NAME, starName);
-        if (typeof nameInput !== 'undefined') nameInput.value = starName;
-      }
+      if (typeof data.settings.volume !== 'undefined'){ volume = (Number(data.settings.volume)||80)/100; localStorage.setItem(LS_VOLUME, Math.round(volume*100)); if (typeof volumeRange !== 'undefined') volumeRange.value = Math.round(volume*100); }
+      if (typeof data.settings.starName === 'string'){ starName = data.settings.starName || 'StarCollector'; localStorage.setItem(LS_NAME, starName); if (typeof nameInput !== 'undefined') nameInput.value = starName; }
     }
-    clickAudio.volume = volume;
-  } catch(e){
-    console.warn('Load failed', e);
-  }
+  } catch(e){ console.warn('Load failed', e); }
 }
 
-// wipe
-wipeBtn.addEventListener('click', () => {
-  // show custom confirm modal
-  confirmWipe.style.display = 'flex';
-});
-confirmWipeNo.addEventListener('click', () => {
-  confirmWipe.style.display = 'none';
-});
-confirmWipeYes.addEventListener('click', () => {
-  // clear save, reset game state, refresh UI
-  localStorage.removeItem(SAVE_KEY);
-  // Also remove stored settings keys
-  localStorage.removeItem(LS_VOLUME);
-  localStorage.removeItem(LS_NAME);
-  // reset variables to defaults
+// wipe confirm
+document.getElementById('wipeBtn').addEventListener('click', ()=>{ confirmWipe.style.display='flex'; });
+confirmWipeNo.addEventListener('click', ()=>{ confirmWipe.style.display='none'; });
+confirmWipeYes.addEventListener('click', ()=>{
+  localStorage.removeItem(SAVE_KEY); localStorage.removeItem(LS_VOLUME); localStorage.removeItem(LS_NAME);
+  // reset core state
   cookies = 0; sessionCookies = 0; cookiesPerClick = 1; clickUpgradeLevel = 0; effUpgradeLevel = 0;
+  buildingMultiplier = 1.0; costMultiplier = 1.0; globalCPSBonus = 0; globalCookieMultiplier = 1.0;
   for (const id in buildingsState) buildingsState[id].owned = 0;
+  purchasedUpgrades.clear();
   volume = 0.8; localStorage.setItem(LS_VOLUME, Math.round(volume*100)); volumeRange.value = Math.round(volume*100);
-  starName = 'StarCollector'; localStorage.setItem(LS_NAME, starName); nameInput.value = starName;
+  starName = 'StarCollector'; localStorage.setItem(LS_NAME, starName); nameInput.value = starName; starNameEl.textContent = starName;
   clickAudio.volume = volume;
-  confirmWipe.style.display = 'none';
-  refreshUI();
-  saveGame();
+  confirmWipe.style.display='none';
+  refreshUI(); saveGame(); generateExportCode();
 });
 
-// quick Save Now button
-saveNowBtn.addEventListener('click', () => {
-  saveGame();
-  // small visual feedback
-  saveNowBtn.textContent = 'Saved';
-  setTimeout(()=> saveNowBtn.textContent = 'Save Now', 900);
-});
+// Save Now
+saveNowBtn.addEventListener('click', ()=>{ saveGame(); saveNowBtn.textContent='Saved'; setTimeout(()=>saveNowBtn.textContent='Save Now',900); });
 
-// autosave every 10 seconds
+// autosave
 setInterval(saveGame, 10000);
-// save on unload
 window.addEventListener('beforeunload', saveGame);
 
-// ---------- initial render ----------
+// ---------- EXPORT / IMPORT CODE ----------
+function generateExportCode(){
+  const data = getSaveData();
+  // JSON -> UTF8 -> base64
+  try{
+    const json = JSON.stringify(data);
+    const b64 = btoa(unescape(encodeURIComponent(json)));
+    exportCodeInput.value = b64;
+    return b64;
+  } catch(e){
+    console.warn('Export failed', e);
+    exportCodeInput.value = '';
+    return '';
+  }
+}
+copyCodeBtn.addEventListener('click', async ()=>{
+  const code = exportCodeInput.value;
+  if (!code) return;
+  try{
+    await navigator.clipboard.writeText(code);
+    copyCodeBtn.textContent = 'Copied!';
+    setTimeout(()=> copyCodeBtn.textContent = 'Copy code', 900);
+  } catch(e){
+    // fallback select
+    exportCodeInput.select();
+    document.execCommand('copy');
+    copyCodeBtn.textContent = 'Copied!';
+    setTimeout(()=> copyCodeBtn.textContent = 'Copy code', 900);
+  }
+});
+
+// import flow: paste -> parse -> confirm -> apply (overwrites current save)
+importBtn.addEventListener('click', ()=>{
+  const code = importInput.value.trim();
+  if (!code) { alert('Paste a code first'); return; }
+  let json = null;
+  try{
+    const str = decodeURIComponent(escape(atob(code)));
+    json = JSON.parse(str);
+  } catch(e){
+    try { // some older clients may have used direct btoa, attempt a different decode
+      const str2 = atob(code);
+      json = JSON.parse(str2);
+    } catch(err){
+      alert('Invalid code — could not parse.');
+      return;
+    }
+  }
+  if (!json || typeof json !== 'object'){ alert('Invalid code data'); return; }
+  if (!confirm('Importing this code will overwrite your current progress. Proceed?')) return;
+  // apply imported data (map fields)
+  try{
+    cookies = Number(json.cookies) || 0; sessionCookies = Number(json.sessionCookies) || 0;
+    cookiesPerClick = Number(json.cookiesPerClick) || 1;
+    clickUpgradeLevel = Number(json.clickUpgradeLevel) || 0;
+    effUpgradeLevel = Number(json.effUpgradeLevel) || 0;
+    buildingMultiplier = Number(json.buildingMultiplier) || 1.0;
+    costMultiplier = Number(json.costMultiplier) || 1.0;
+    globalCPSBonus = Number(json.globalCPSBonus) || 0;
+    globalCookieMultiplier = Number(json.globalCookieMultiplier) || 1.0;
+    if (json.buildings && typeof json.buildings === 'object'){
+      for (const [id,n] of Object.entries(json.buildings)){ if (buildingsState[id]) buildingsState[id].owned = Number(n) || 0; }
+    }
+    purchasedUpgrades.clear();
+    if (Array.isArray(json.purchased)) json.purchased.forEach(id=>purchasedUpgrades.add(id));
+    if (json.settings){
+      if (typeof json.settings.volume !== 'undefined'){ volume = (Number(json.settings.volume)||80)/100; localStorage.setItem(LS_VOLUME, Math.round(volume*100)); volumeRange.value = Math.round(volume*100); }
+      if (typeof json.settings.starName === 'string'){ starName = json.settings.starName || 'StarCollector'; localStorage.setItem(LS_NAME, starName); nameInput.value = starName; starNameEl.textContent = starName; }
+    }
+    refreshUI(); saveGame(); alert('Import successful!');
+  } catch(e){ console.warn('Import apply failed', e); alert('Import failed'); }
+});
+
+// ---------- UTIL & UI HELPERS ----------
+function flashButton(el){ if (!el) return; el.style.transform="translateY(-4px)"; el.style.boxShadow="0 8px 22px rgba(255,0,80,0.08)"; setTimeout(()=>{ el.style.transform=""; el.style.boxShadow=""; },220); }
+
+// ---------- INITIAL RENDER & START ----------
+renderUpgrades();
 renderBuildings();
 refreshUI();
 clickAudio.volume = volume;
 
-// keyboard & modal helpers
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    settingsModal.style.display = 'none';
-    settingsModal.setAttribute('aria-hidden','true');
-    confirmWipe.style.display = 'none';
-  }
-});
-nameInput.addEventListener('blur', () => { localStorage.setItem(LS_NAME, nameInput.value.slice(0,20) || 'StarCollector'); });
-settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) { settingsModal.style.display = 'none'; settingsModal.setAttribute('aria-hidden','true'); } });
+// keyboard & small UI behavior
+document.addEventListener('keydown',(e)=>{ if (e.key === 'Escape'){ settingsModal.style.display='none'; settingsModal.setAttribute('aria-hidden','true'); confirmWipe.style.display='none'; } });
+nameInput.addEventListener('blur', ()=>{ localStorage.setItem(LS_NAME, nameInput.value.slice(0,20) || 'StarCollector'); generateExportCode(); saveGame(); });
+settingsModal.addEventListener('click',(e)=>{ if (e.target === settingsModal) { settingsModal.style.display='none'; settingsModal.setAttribute('aria-hidden','true'); } });
 
 </script>
 </body>
