@@ -16,21 +16,20 @@
     --buy-active: linear-gradient(90deg,var(--accent1),var(--accent2));
   }
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+  html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;background:#081428;color:#e6eef8}
   body{
     background:
-      radial-gradient(1200px 600px at 10% 10%, rgba(255,138,182,0.06), transparent 8%),
+      radial-gradient(1200px 600px at 10% 10%, rgba(255,138,182,0.04), transparent 8%),
       linear-gradient(180deg, var(--bg1), var(--bg2)),
       url('SpaceBackground.jfif');
     background-blend-mode: overlay, overlay, normal;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    color:#e6eef8;
     display:flex;
     align-items:flex-start;
     justify-content:center;
-    padding:18px;
+    padding:12px;
     min-height:100vh;
     gap:12px;
   }
@@ -38,23 +37,24 @@
   /* TOP BAR (export/import code) */
   #topBar{
     position:fixed;
-    top:10px;
+    top:8px;
     left:50%;
     transform:translateX(-50%);
     z-index:10001;
-    width:88%;
+    width:92%;
     max-width:1200px;
     display:flex;
     gap:8px;
     align-items:center;
-    padding:10px 12px;
-    background: rgba(4,12,24,0.6);
+    padding:8px;
+    background: rgba(4,12,24,0.72);
     border:1px solid rgba(255,255,255,0.04);
-    border-radius:12px;
+    border-radius:10px;
     backdrop-filter: blur(6px);
   }
-  #exportCode{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaf2ff}
-  #importInput{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaf2ff}
+  #topBar input[type="text"], #topBar input[readonly]{
+    flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaf2ff;font-size:13px;
+  }
   .topBtn{padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaf2ff;cursor:pointer;font-weight:700}
   .topBtn.positive{background:var(--buy-active);color:#082032;border:none}
 
@@ -67,7 +67,7 @@
     background: rgba(0,0,0,0.28);
     border:1px solid rgba(255,255,255,0.06);
     color:#eaf2ff;
-    padding:10px 12px;
+    padding:8px 10px;
     border-radius:10px;
     cursor:pointer;
     backdrop-filter: blur(4px);
@@ -76,169 +76,121 @@
   }
 
   /* Loading overlay */
-  #loadingOverlay{
-    position:fixed;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:linear-gradient(180deg, rgba(2,6,23,0.92), rgba(2,6,23,0.95));
-    z-index:9999;
-    flex-direction:column;
-    gap:18px;
-    color:#eaf2ff;
-  }
+  #loadingOverlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(2,6,23,0.92), rgba(2,6,23,0.95));z-index:9999;flex-direction:column;gap:18px;color:#eaf2ff}
   #loadingBox{width:520px;max-width:90%;padding:18px;border-radius:12px;background: rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);text-align:center}
   #loadingBarWrap{width:100%;background: rgba(255,255,255,0.03);border-radius:12px;padding:6px;margin-top:12px}
   #loadingBar{height:14px;width:0%;border-radius:8px;background: linear-gradient(90deg, var(--accent1), var(--accent2));transition: width 300ms ease}
 
-  /* Main container */
-  #main{
-    width:100%;
-    max-width:1200px;
-    display:flex;
-    gap:20px;
-    align-items:flex-start;
-    margin-top:70px;
-  }
+  /* Main layout */
+  #main{width:100%;max-width:1200px;display:flex;gap:16px;align-items:flex-start;margin-top:62px}
+  .panel{background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));border:1px solid var(--glass-border);backdrop-filter: blur(6px);padding:12px;border-radius: 12px;box-shadow: 0 8px 30px rgba(2,6,23,0.55);}
 
-  .panel{background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));border:1px solid var(--glass-border);backdrop-filter: blur(6px);padding:18px;border-radius: var(--glass-radius);box-shadow: 0 8px 30px rgba(2,6,23,0.55);}
-
-  /* Left column */
+  /* Columns */
   #leftCol{width:420px;display:flex;flex-direction:column;gap:12px}
+  #rightCol{flex:1;display:flex;flex-direction:column;gap:12px}
+
+  /* header & meta */
   .titleRow{display:flex;align-items:center;justify-content:space-between}
   h1{margin:0;font-size:20px}
   .sub{color:var(--muted);font-size:13px}
-  #totalCookies{font-size:34px;margin-top:6px;font-weight:700;color:#fff;text-shadow: 0 6px 18px rgba(0,0,0,0.6);}
+  #totalCookies{font-size:28px;margin-top:6px;font-weight:800;color:#fff;text-shadow: 0 6px 18px rgba(0,0,0,0.6);}
 
-  .metaRow{display:flex;gap:10px;margin-top:6px}
-  .meta{background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border: 1px solid rgba(255,255,255,0.03);padding:10px 12px;border-radius:10px;font-size:13px;min-width:120px;text-align:left}
-  .meta strong{display:block;font-size:15px;color:#fff}
+  .metaRow{display:flex;gap:8px;margin-top:6px}
+  .meta{background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border: 1px solid rgba(255,255,255,0.03);padding:8px 10px;border-radius:8px;font-size:13px;text-align:left}
+  .meta strong{display:block;font-size:14px;color:#fff}
 
-  /* Upgrades list */
-  #upgradesList{display:flex;flex-direction:column;gap:8px;margin-top:6px;max-height:260px;overflow:auto;padding-right:8px}
-  .upgradeItem{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.015)}
+  /* Upgrades */
+  #upgradesList{display:flex;flex-direction:column;gap:8px;margin-top:6px;max-height:220px;overflow:auto;padding-right:6px}
+  .upgradeItem{display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.015)}
   .upgradeItem .left{display:flex;flex-direction:column}
-  .upgradeItem .name{font-weight:800}
+  .upgradeItem .name{font-weight:700}
   .upgradeItem .desc{font-size:12px;color:var(--muted)}
   .upgradeItem button{padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaf2ff;cursor:pointer}
-  .upgradeItem button.bought{background:rgba(255,255,255,0.06);color:var(--muted);cursor:default;border:none}
 
   /* Multi-buy */
-  #multiBuyWrap{display:flex;gap:8px;align-items:center;margin-top:8px}
-  .multiBtn{padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaf2ff;cursor:pointer;font-weight:700}
+  #multiBuyWrap{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+  .multiBtn{padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaf2ff;cursor:pointer;font-weight:700}
   .multiBtn.active{background:var(--buy-active);color:#082032;border:none;box-shadow:0 6px 22px rgba(255,138,182,0.06)}
 
   /* Buildings */
-  #buildingsList{margin-top:6px;display:flex;flex-direction:column;gap:10px;max-height:420px;overflow-y:auto;padding-right:8px}
-  #buildingsList::-webkit-scrollbar{width:10px} #buildingsList::-webkit-scrollbar-track{background:transparent}
-  #buildingsList::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border-radius:10px;border:2px solid transparent;background-clip:padding-box}
+  #buildingsList{margin-top:6px;display:flex;flex-direction:column;gap:10px;max-height:480px;overflow-y:auto;padding-right:6px}
+  #buildingsList::-webkit-scrollbar{width:10px}
+  #buildingsList::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border-radius:10px}
   .building{display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.015);gap:10px}
   .b-left{display:flex;gap:10px;align-items:center}
-  .b-icon{width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#082032;box-shadow:0 6px 18px rgba(255,138,182,0.08)}
+  .b-icon{width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#082032}
   .b-info{display:flex;flex-direction:column}
   .b-info .name{font-weight:800}
   .b-info .desc{font-size:12px;color:var(--muted)}
   .b-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
   .b-cost{font-size:13px;color:var(--muted)}
-  .buyBtn{background:transparent;border:1px solid rgba(255,255,255,0.08);color:#fff;padding:6px 10px;border-radius:10px;cursor:pointer;font-weight:700}
+  .buyBtn{background:transparent;border:1px solid rgba(255,255,255,0.08);color:#fff;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:700}
   .buyBtn.buyable{background:var(--buy-active);color:#082032;border:none;box-shadow:0 6px 22px rgba(255,138,182,0.12)}
+  .pricePreview{font-size:12px;color:var(--muted);margin-top:6px;text-align:right}
 
-  /* Right column */
-  #rightCol{flex:1;display:flex;flex-direction:column;gap:12px}
-  #starCard{display:flex;flex-direction:column;align-items:center;padding:20px;border-radius:18px;background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 40px rgba(2,6,23,0.55)}
-  #starName{font-weight:800;margin-bottom:10px;color:#fff}
-  #cookieBtn{width:280px;max-width:60%;cursor:pointer;user-select:none;transform-origin:center;transition: transform .12s ease, filter .12s ease}
-  #cookieBtn:hover{ transform:translateY(-6px) rotate(-2deg) }
-  #cookieBtn:active{ transform:scale(.94) rotate(0deg) }
-  #starStats{margin-top:14px;display:flex;gap:18px;align-items:center;justify-content:center}
-  .stat{text-align:center;padding:8px 14px;border-radius:12px;background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);min-width:140px}
+  /* Star clicker */
+  #starCard{display:flex;flex-direction:column;align-items:center;padding:16px;border-radius:12px}
+  #starName{font-weight:800;margin-bottom:8px;color:#fff}
+  #cookieBtn{width:320px;max-width:80%;cursor:pointer;user-select:none;border-radius:12px}
+  #starStats{margin-top:12px;display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}
+  .stat{text-align:center;padding:8px 12px;border-radius:8px;background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);min-width:120px}
   .stat .label{ font-size:12px; color:var(--muted); }
   .stat .value{ margin-top:6px; font-size:18px; font-weight:800; color:#fff}
 
-  /* Settings modal */
+  /* settings modal */
   #settingsModal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:99999}
   #settingsCard{background:#071025;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);width:420px;max-width:92%}
-  #settingsCard h3{margin:0 0 8px 0}
   .row{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:12px}
-  .row label{font-size:13px;color:var(--muted);min-width:140px}
   input[type="range"]{width:100%}
   input[type="text"]{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaf2ff}
 
-  /* Confirm wipe */
+  /* confirm wipe */
   #confirmWipe{display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:100000}
   #confirmCard{background:#071025;padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);width:360px;text-align:center}
   #confirmCard button{margin:8px;padding:8px 12px;border-radius:8px}
 
-  @media (max-width:1100px){
-    body{padding:12px}
-    #topBar{width:95%}
+  /* responsive tweaks */
+  @media (max-width:900px){
     #main{flex-direction:column;align-items:center;margin-top:120px}
     #leftCol{width:100%;max-width:760px}
     #rightCol{width:100%}
+    #cookieBtn{width:260px}
+    .b-icon{width:44px;height:44px}
+    .buyBtn{padding:10px 14px}
+    #topBar{flex-direction:column;gap:6px;left:50%;transform:translateX(-50%);top:6px;padding:10px}
+    #topBar input{font-size:13px}
+  }
+  @media (max-width:420px){
     #cookieBtn{width:220px}
+    .stat{min-width:100px;padding:6px}
+    .titleRow h1{font-size:18px}
+    #totalCookies{font-size:22px}
   }
 </style>
 </head>
 <body>
-  <!-- TOP BAR: export / import code -->
+  <!-- TOP BAR -->
   <div id="topBar">
-    <input id="exportCode" readonly aria-label="Export code" title="Copy/export code (share to other device)">
+    <input id="exportCode" readonly aria-label="Export code" title="Copy/export code">
     <button id="copyCodeBtn" class="topBtn">Copy code</button>
-    <input id="importInput" placeholder="Paste import code here..." aria-label="Import code">
+    <input id="importInput" placeholder="Paste code here..." aria-label="Import code">
     <button id="importBtn" class="topBtn">Load code</button>
   </div>
 
-  <button id="settingsBtn" aria-haspopup="dialog">⚙ Settings</button>
+  <button id="settingsBtn">⚙</button>
 
   <!-- Loading -->
   <div id="loadingOverlay" role="status" aria-live="polite">
     <div id="loadingBox">
-      <div style="font-size:20px;font-weight:800">BoringClicker</div>
+      <div style="font-size:18px;font-weight:800">BoringClicker</div>
       <div style="margin-top:8px;color:var(--muted)">Loading assets — please wait</div>
       <div id="loadingBarWrap"><div id="loadingBar"></div></div>
       <div id="loadingPercent" style="margin-top:8px;color:var(--muted)">0%</div>
     </div>
   </div>
 
-  <!-- Settings Modal -->
-  <div id="settingsModal" role="dialog" aria-modal="true" aria-hidden="true">
-    <div id="settingsCard" class="panel">
-      <h3>Settings</h3>
-      <div style="font-size:13px;color:var(--muted)">Adjust sound volume and rename your StarCollector. Save/export options below.</div>
-
-      <div class="row" style="margin-top:12px">
-        <label for="volumeRange">Sound Volume</label>
-        <input id="volumeRange" type="range" min="0" max="100" step="1" value="80" />
-      </div>
-
-      <div class="row">
-        <label for="nameInput">StarCollector name</label>
-        <input id="nameInput" type="text" maxlength="20" placeholder="StarCollector" />
-      </div>
-
-      <div style="display:flex;gap:8px;justify-content:space-between;margin-top:12px">
-        <button id="saveNow" class="buyBtn">Save Now</button>
-        <button id="wipeBtn" class="buyBtn" style="background:transparent;border:1px solid rgba(255,80,80,0.1);color:#ffb3b3">Wipe Save</button>
-        <button id="settingsClose" class="buyBtn">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Confirm Wipe -->
-  <div id="confirmWipe" role="dialog" aria-modal="true">
-    <div id="confirmCard">
-      <div style="font-weight:800;font-size:16px;margin-bottom:8px">Confirm wipe</div>
-      <div style="color:var(--muted);margin-bottom:12px">Are you sure you want to delete your save? This cannot be undone.</div>
-      <div>
-        <button id="confirmWipeYes" class="buyBtn" style="background:linear-gradient(90deg,#ff8a8a,#ff5a5a);color:#082032">Yes, wipe</button>
-        <button id="confirmWipeNo" class="buyBtn" style="margin-left:8px">Cancel</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Main -->
-  <div id="main">
+  <div id="main" style="visibility:visible;">
     <div id="leftCol">
       <div class="panel">
         <div class="titleRow">
@@ -246,14 +198,14 @@
             <h1>BoringClicker</h1>
             <div class="sub">Buy space things — produce cookies per second</div>
           </div>
-          <div class="sub" style="text-align:right">v1.6+</div>
+          <div class="sub" style="text-align:right">v1.7</div>
         </div>
 
         <div id="totalCookies">0</div>
 
         <div class="metaRow">
-          <div class="meta"><div class="label">Cookies</div><strong id="metaTotal">0</strong><div class="cost">Available cookies</div></div>
-          <div class="meta"><div class="label">Session</div><strong id="metaSession">0</strong><div class="cost">This session</div></div>
+          <div class="meta"><div class="label">Cookies</div><strong id="metaTotal">0</strong></div>
+          <div class="meta"><div class="label">Session</div><strong id="metaSession">0</strong></div>
         </div>
 
         <div style="margin-top:8px">
@@ -261,7 +213,8 @@
           <div id="upgradesList" aria-live="polite"></div>
         </div>
 
-        <div id="multiBuyWrap"><div class="sub">Buy amount:</div>
+        <div id="multiBuyWrap">
+          <div class="sub">Buy amount:</div>
           <button class="multiBtn active" data-mult="1">x1</button>
           <button class="multiBtn" data-mult="10">x10</button>
           <button class="multiBtn" data-mult="100">x100</button>
@@ -273,7 +226,7 @@
           <div id="buildingsList" role="list"></div>
         </div>
 
-        <div style="margin-top:10px;color:var(--muted);font-size:13px">Tip: Use the export code above to move progress between devices.</div>
+        <div style="margin-top:10px;color:var(--muted);font-size:13px">Tip: use the export code above to save your progress — the game will not auto-save.</div>
       </div>
     </div>
 
@@ -286,108 +239,119 @@
       <div id="starStats">
         <div class="stat"><div class="label">Cookies / second</div><div class="value" id="cpsValue">0</div></div>
         <div class="stat"><div class="label">Cookies / click</div><div class="value" id="cpcValue">1</div></div>
+        <div class="stat"><div class="label">Buy preview</div><div class="value" id="buyPreview">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div id="settingsCard" class="panel">
+      <h3>Settings</h3>
+      <div style="font-size:13px;color:var(--muted)">Change sound volume and star name. SAVE by copying export code.</div>
+
+      <div class="row" style="margin-top:12px">
+        <label for="volumeRange">Sound Volume</label>
+        <input id="volumeRange" type="range" min="0" max="100" step="1" value="80" />
+      </div>
+
+      <div class="row">
+        <label for="nameInput">StarCollector name</label>
+        <input id="nameInput" type="text" maxlength="20" placeholder="StarCollector" />
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:space-between;margin-top:12px">
+        <button id="saveNow" class="buyBtn topBtn positive">Generate Code</button>
+        <button id="wipeBtn" class="buyBtn" style="background:transparent;border:1px solid rgba(255,80,80,0.1);color:#ffb3b3">Wipe</button>
+        <button id="settingsClose" class="buyBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Wipe -->
+  <div id="confirmWipe" role="dialog" aria-modal="true">
+    <div id="confirmCard">
+      <div style="font-weight:800;font-size:16px;margin-bottom:8px">Confirm wipe</div>
+      <div style="color:var(--muted);margin-bottom:12px">Are you sure? This will reset your local session. You can restore from export code if you kept it.</div>
+      <div>
+        <button id="confirmWipeYes" class="buyBtn" style="background:linear-gradient(90deg,#ff8a8a,#ff5a5a);color:#082032">Yes, wipe</button>
+        <button id="confirmWipeNo" class="buyBtn" style="margin-left:8px">Cancel</button>
       </div>
     </div>
   </div>
 
 <script>
-/* BoringClicker — v1.6+ (upgrades + export/import code)
-   - New: many one-time upgrades (balanced)
-   - Export code (copy at top) — base64 JSON string of save (cookies, upgrades, buildings, settings)
-   - Import paste field at top (Load code) — overwrites current save after confirm
-   - Save/load (localStorage), autosave, wipe with confirm
-   - Multibuy buttons, rate-limited click sounds, settings modal
+/* BoringClicker v1.7 - Mobile support + dynamic multibuy preview + export-only save (no autosave/localStorage)
+   Notes:
+   - The ONLY persistent save is the export code (top input). Generate it via "Generate Code" or "Copy code".
+   - Import by pasting a code into the right field and pressing Load code.
+   - No autosave; no localStorage writes.
 */
 
-// ---------- CONFIG & SAVE KEYS ----------
-const SAVE_KEY = 'bc_save_v2';
-const LS_VOLUME = 'bc_volume_v2';
-const LS_NAME = 'bc_name_v2';
-
-// ---------- ASSETS LOADING ----------
+/* ---------- ASSETS PRELOAD (non-blocking) ---------- */
 const assets = ['StarClickMain.png','SpaceBackground.jfif','ClickSound.mp3'];
 let assetsLoaded = 0;
 const loadingOverlay = document.getElementById('loadingOverlay');
 const loadingBar = document.getElementById('loadingBar');
 const loadingPercent = document.getElementById('loadingPercent');
-const gameWrap = document.getElementById('main');
 
-let clickAudio = new Audio('ClickSound.mp3');
-clickAudio.preload = 'auto';
-clickAudio.crossOrigin = 'anonymous';
-clickAudio.addEventListener('canplaythrough', ()=>{ assetsLoaded++; updateLoadingProgress(); revealIfReady(); }, { once:true });
-clickAudio.addEventListener('error', ()=>{ assetsLoaded++; updateLoadingProgress(); revealIfReady(); }, { once:true });
+const exportCodeInput = document.getElementById('exportCode');
+const copyCodeBtn = document.getElementById('copyCodeBtn');
+const importInput = document.getElementById('importInput');
+const importBtn = document.getElementById('importBtn');
 
-assets.filter(a => a.endsWith('.png') || a.endsWith('.jfif')).forEach(src=>{
-  const img = new Image();
-  img.src = src;
-  img.onload = ()=>{ assetsLoaded++; updateLoadingProgress(); revealIfReady(); };
-  img.onerror = ()=>{ assetsLoaded++; updateLoadingProgress(); revealIfReady(); };
+let clickAudio = new Audio('ClickSound.mp3'); clickAudio.preload='auto'; clickAudio.crossOrigin='anonymous';
+clickAudio.addEventListener('canplaythrough', ()=>{ assetsLoaded++; updateLoadingProgress(); hideLoaderIfReady(); },{once:true});
+clickAudio.addEventListener('error', ()=>{ assetsLoaded++; updateLoadingProgress(); hideLoaderIfReady(); },{once:true});
+
+assets.filter(a=>a.endsWith('.png')||a.endsWith('.jfif')).forEach(src=>{
+  const img=new Image(); img.src=src;
+  img.onload=()=>{ assetsLoaded++; updateLoadingProgress(); hideLoaderIfReady(); };
+  img.onerror=()=>{ assetsLoaded++; updateLoadingProgress(); hideLoaderIfReady(); };
 });
-function updateLoadingProgress(){ const pct = Math.round((assetsLoaded / assets.length) * 100); loadingBar.style.width = pct + '%'; loadingPercent.textContent = pct + '%'; }
-function revealIfReady(){
+function updateLoadingProgress(){ const pct=Math.round((assetsLoaded/assets.length)*100); loadingBar.style.width=pct+'%'; loadingPercent.textContent=pct+'%'; }
+function hideLoaderIfReady(){
   if (assetsLoaded >= assets.length){
-    // load saved game before revealing UI
-    loadGame();
-    setTimeout(()=>{ loadingOverlay.style.opacity=0; setTimeout(()=>loadingOverlay.remove(),420); gameWrap.style.visibility='visible'; refreshUI(); generateExportCode(); }, 300);
+    setTimeout(()=>{ loadingOverlay.style.opacity=0; setTimeout(()=>loadingOverlay.remove(),420); },220);
   }
 }
-setTimeout(()=>{ if (assetsLoaded < assets.length) { assetsLoaded = Math.min(assets.length, assetsLoaded+1); updateLoadingProgress(); revealIfReady(); } }, 2000);
+setTimeout(()=>{ if (assetsLoaded < assets.length){ assetsLoaded = Math.min(assets.length, assetsLoaded+1); updateLoadingProgress(); hideLoaderIfReady(); } },1500);
 
 /* ---------- GAME STATE ---------- */
 let cookies = 0;
 let sessionCookies = 0;
 let cookiesPerClick = 1;
-let clickUpgradeLevel = 0;
-let effUpgradeLevel = 0;
+let buildingMultiplier = 1.0;
+let costMultiplier = 1.0;
+let globalCPSBonus = 0;
+let globalCookieMultiplier = 1.0;
 
-// extra system variables affected by upgrades
-let buildingMultiplier = 1.0;   // multiplies building CPS
-let costMultiplier = 1.0;       // multiplies base building cost
-let globalCPSBonus = 0;         // flat CPS added
-let globalCookieMultiplier = 1.0; // multiplies final cookie gains (not used for purchases)
-
-// BUILDINGS — easy to add via initialBuildings array
 const initialBuildings = [
-  { id:'telescope', name:'Telescope', baseCost:15, baseCPS:0.1, desc:'Basic science: small CPS' },
-  { id:'space_rocket', name:'Space Rocket', baseCost:200, baseCPS:1.25, desc:'Rockets launching probes' },
-  { id:'satellite', name:'Satellite', baseCost:1100, baseCPS:9, desc:'Orbiting machines, steady income' },
-  { id:'space_station', name:'Space Station', baseCost:12000, baseCPS:48, desc:'Big orbital platform' },
-  { id:'solar_probe', name:'Solar Probe', baseCost:130000, baseCPS:270, desc:'Expensive probes near stars' },
-  { id:'tiny_planet', name:'Tiny Planet', baseCost:1400000, baseCPS:1450, desc:'Small artificial world' },
-  { id:'gas_giant', name:'Gas Giant', baseCost:20000000, baseCPS:7800, desc:'Huge yields but very expensive' },
-  { id:'alien_megaplanet', name:'Alien MegaPlanet', baseCost:330000000, baseCPS:44000, desc:'Mega investment: massive CPS' }
+  { id:'telescope', name:'Telescope', baseCost:15, baseCPS:0.1, desc:'Basic science' },
+  { id:'space_rocket', name:'Space Rocket', baseCost:200, baseCPS:1.25, desc:'Rockets' },
+  { id:'satellite', name:'Satellite', baseCost:1100, baseCPS:9, desc:'Satellites' },
+  { id:'space_station', name:'Space Station', baseCost:12000, baseCPS:48, desc:'Stations' },
+  { id:'solar_probe', name:'Solar Probe', baseCost:130000, baseCPS:270, desc:'Probes' },
+  { id:'tiny_planet', name:'Tiny Planet', baseCost:1400000, baseCPS:1450, desc:'Tiny planets' },
+  { id:'gas_giant', name:'Gas Giant', baseCost:20000000, baseCPS:7800, desc:'Gas giants' },
+  { id:'alien_megaplanet', name:'Alien MegaPlanet', baseCost:330000000, baseCPS:44000, desc:'Mega planets' }
 ];
-
-let buildingDefs = [];
-const buildingsState = {}; // each: {owned}
-
-function registerBuilding(def){ buildingDefs.push(Object.assign({},def)); buildingsState[def.id] = buildingsState[def.id] || {owned:0}; }
+let buildingDefs=[]; const buildingsState={};
+function registerBuilding(d){ buildingDefs.push(Object.assign({},d)); buildingsState[d.id] = buildingsState[d.id] || {owned:0}; }
 initialBuildings.forEach(b=>registerBuilding(b));
 
-// UPGRADES (one-time purchases, not OP)
-// Each upgrade has id,name,desc,cost,apply(state) which applies its effect when bought
+/* upgrades simplified (balanced moderate) */
 const upgradesDefs = [
-  { id:'u_click_1', name:'Click +1', desc:'+1 cookies per click', cost:500, apply:()=> { cookiesPerClick += 1; } },
-  { id:'u_click_5', name:'Click +5', desc:'+5 cookies per click', cost:2500, apply:()=> { cookiesPerClick += 5; } },
-  { id:'u_click_double', name:'Click Doubler', desc:'Double your cookies-per-click', cost:20000, apply:()=> { cookiesPerClick = Math.round(cookiesPerClick * 2); } },
-  { id:'u_build_10', name:'Engine Tuning', desc:'+10% building CPS', cost:10000, apply:()=> { buildingMultiplier += 0.10; } },
-  { id:'u_build_50', name:'Quantum Efficiency', desc:'+50% building CPS', cost:75000, apply:()=> { buildingMultiplier += 0.50; } },
-  { id:'u_auto_2', name:'Auto Core', desc:'+2 flat CPS (always on)', cost:12000, apply:()=> { globalCPSBonus += 2; } },
-  { id:'u_global_5', name:'Harvest Protocol', desc:'+5% overall cookie gain', cost:30000, apply:()=> { globalCookieMultiplier *= 1.05; } },
-  { id:'u_cost_down', name:'Manufacturing Discount', desc:'-7% building base cost', cost:20000, apply:()=> { costMultiplier *= 0.93; } },
-  { id:'u_build_special', name:'Advanced Modules', desc:'+20% CPS for small buildings', cost:50000, apply:()=> { /* special: boost telescopes & rockets */ 
-      buildingDefs.forEach(d=>{ if (d.id==='telescope'||d.id==='space_rocket') d.baseCPS = d.baseCPS * 1.2; });
-    } 
-  },
-  { id:'u_click_small', name:'Finger Training', desc:'+2 cookies per click', cost:6000, apply:()=> { cookiesPerClick += 2; } },
-  { id:'u_mini_boost', name:'Micro Boost', desc:'+200 cookies (one-time bonus)', cost:15000, apply:()=> { cookies += 200; } },
-  { id:'u_build_multi', name:'Structural Upgrade', desc:'+15% building CPS', cost:40000, apply:()=> { buildingMultiplier += 0.15; } }
+  { id:'u_click_1', name:'Click +1', desc:'+1 CPC', cost:500, apply:()=>{ cookiesPerClick += 1; } },
+  { id:'u_click_3', name:'Click +3', desc:'+3 CPC', cost:2200, apply:()=>{ cookiesPerClick += 3; } },
+  { id:'u_build_15', name:'Engine Tuning', desc:'+15% building CPS', cost:15000, apply:()=>{ buildingMultiplier += 0.15; } },
+  { id:'u_cost_cut', name:'Discount Field', desc:'-5% building cost', cost:12000, apply:()=>{ costMultiplier *= 0.95; } },
+  { id:'u_auto_1', name:'Power Relay', desc:'+1 flat CPS', cost:9000, apply:()=>{ globalCPSBonus += 1; } },
+  { id:'u_cookie_mult', name:'Cookie Booster', desc:'+10% cookie gain', cost:25000, apply:()=>{ globalCookieMultiplier *= 1.10; } }
 ];
-// purchased set
 const purchasedUpgrades = new Set();
 
-// ---------- UI Refs ----------
+/* ---------- UI refs ---------- */
 const totalEl = document.getElementById('totalCookies');
 const metaTotal = document.getElementById('metaTotal');
 const metaSession = document.getElementById('metaSession');
@@ -397,19 +361,13 @@ const btn = document.getElementById('cookieBtn');
 const buildingsList = document.getElementById('buildingsList');
 const upgradesListEl = document.getElementById('upgradesList');
 const starNameEl = document.getElementById('starName');
-const exportCodeInput = document.getElementById('exportCode');
-const copyCodeBtn = document.getElementById('copyCodeBtn');
-const importInput = document.getElementById('importInput');
-const importBtn = document.getElementById('importBtn');
+const buyPreviewEl = document.getElementById('buyPreview');
 
-const buyClickUpgradeBtn = document.getElementById('buyClickUpgrade');
-const buyEffUpgradeBtn = document.getElementById('buyEffUpgrade');
-
-const settingsBtn = document.getElementById('settingsBtn');
-const settingsModal = document.getElementById('settingsModal');
-const settingsClose = document.getElementById('settingsClose');
 const volumeRange = document.getElementById('volumeRange');
 const nameInput = document.getElementById('nameInput');
+const settingsBtnEl = document.getElementById('settingsBtn');
+const settingsModal = document.getElementById('settingsModal');
+const settingsClose = document.getElementById('settingsClose');
 const saveNowBtn = document.getElementById('saveNow');
 const wipeBtn = document.getElementById('wipeBtn');
 const confirmWipe = document.getElementById('confirmWipe');
@@ -418,78 +376,38 @@ const confirmWipeNo = document.getElementById('confirmWipeNo');
 
 let multiBuy = 1;
 document.querySelectorAll('.multiBtn').forEach(b=>{
-  b.addEventListener('click', ()=>{ document.querySelectorAll('.multiBtn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); const v = b.dataset.mult; multiBuy = (v==='max')? 'max' : Number(v); });
+  b.addEventListener('click', ()=>{ document.querySelectorAll('.multiBtn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); multiBuy = (b.dataset.mult==='max') ? 'max' : Number(b.dataset.mult); updateAllPricePreviews(); });
 });
 
-// ---------- SETTINGS & PERSISTENT VALUES ----------
-let volume = Number(localStorage.getItem(LS_VOLUME) ?? 80) / 100;
-let starName = localStorage.getItem(LS_NAME) ?? 'StarCollector';
-volumeRange.value = Math.round(volume*100);
-nameInput.value = starName;
-starNameEl.textContent = starName;
+/* ---------- AUDIO (rate-limited) ---------- */
+let volume = 0.8;
+clickAudio.volume = volume;
+function getMaxSoundsPerSecond(){ const cps=getCPS(); const v = 12 - Math.floor(Math.log10(cps+10)); return Math.max(1,Math.min(12,v)); }
+let soundTimestamps = [];
+function playSound(){ const now=Date.now(); soundTimestamps = soundTimestamps.filter(t=>now-t<=1000); const allowed=getMaxSoundsPerSecond(); if (soundTimestamps.length>=allowed) return false; soundTimestamps.push(now); try{ const a=clickAudio.cloneNode(); a.volume=volume; a.play().catch(()=>{}); }catch(e){ try{ clickAudio.currentTime=0; clickAudio.volume=volume; clickAudio.play().catch(()=>{}); }catch(_){} } return true; }
 
-volumeRange.addEventListener('input',(e)=>{ volume = Number(e.target.value)/100; localStorage.setItem(LS_VOLUME, Math.round(volume*100)); clickAudio.volume = volume; generateExportCode(); saveGame(); });
-nameInput.addEventListener('input',(e)=>{ starName = e.target.value.slice(0,20) || 'StarCollector'; starNameEl.textContent = starName; localStorage.setItem(LS_NAME, starName); generateExportCode(); saveGame(); });
-settingsBtn.addEventListener('click', ()=>{ settingsModal.style.display='flex'; settingsModal.setAttribute('aria-hidden','false'); });
-settingsClose.addEventListener('click', ()=>{ settingsModal.style.display='none'; settingsModal.setAttribute('aria-hidden','true'); });
-
-// ---------- NUMBER FORMATTING ----------
-function formatNumber(n){
-  if (!isFinite(n)) return '0';
-  const abs = Math.abs(n);
-  if (abs < 1000) return Math.floor(n).toString();
-  if (abs < 1e6) return Math.floor(n).toLocaleString();
-  const millions = n / 1e6;
-  if (millions < 1000){ const rounded = Math.round(millions*100)/100; return (Number.isInteger(rounded) ? rounded.toLocaleString() : rounded.toFixed(2)) + ' million'; }
-  const roundedMillions = Math.round(millions);
-  return roundedMillions.toLocaleString() + ' million';
-}
-
-// ---------- FORMULAS ----------
+/* ---------- FORMULAS & helpers ---------- */
 const COST_SCALE = 1.17;
 function getBuildingCost(def, owned){ return Math.ceil(def.baseCost * costMultiplier * Math.pow(COST_SCALE, owned)); }
-function getClickUpgradeCost(level){ return Math.ceil(8000 * Math.pow(3.2, level)); }
-function getEffUpgradeCost(level){ return Math.ceil(25000 * Math.pow(2.8, level)); }
-function getBuildingCPS(){
-  let total = 0;
-  for (const d of buildingDefs) total += buildingsState[d.id].owned * d.baseCPS;
-  return total * buildingMultiplier + globalCPSBonus;
-}
+function getCostForN(def, owned, n){ let total=0; for(let i=0;i<n;i++) total += getBuildingCost(def, owned+i); return total; }
+function getMaxAffordable(def, owned, available){ let n=0, cost=0; while(n<100000){ const next = getBuildingCost(def, owned + n); if (cost + next <= available){ cost += next; n++; } else break; } return {count:n,cost}; }
+function formatNumber(n){ if (!isFinite(n)) return '0'; const abs=Math.abs(n); if (abs<1000) return Math.floor(n).toString(); if (abs<1e6) return Math.floor(n).toLocaleString(); const millions = n/1e6; if (millions<1000){ const rounded=Math.round(millions*100)/100; return (Number.isInteger(rounded)? rounded.toLocaleString(): rounded.toFixed(2)) + ' million'; } return Math.round(millions).toLocaleString() + ' million'; }
+function getBuildingCPS(){ let total=0; for(const d of buildingDefs) total += buildingsState[d.id].owned * d.baseCPS; return total * buildingMultiplier + globalCPSBonus; }
 function getCPS(){ return getBuildingCPS(); }
 
-// ---------- AUDIO RATE LIMITER ----------
-let soundTimestamps = [];
-clickAudio.volume = volume;
-clickAudio.loop = false;
-function getMaxSoundsPerSecond(){
-  const cps = getCPS();
-  const v = 12 - Math.floor(Math.log10(cps + 10));
-  return Math.max(1, Math.min(12, v));
-}
-function playSound(){
-  const now = Date.now();
-  soundTimestamps = soundTimestamps.filter(t=> (now - t) <= 1000);
-  const maxAllowed = getMaxSoundsPerSecond();
-  if (soundTimestamps.length >= maxAllowed) return false;
-  soundTimestamps.push(now);
-  try { const a = clickAudio.cloneNode(); a.volume = volume; a.play().catch(()=>{}); } catch(e){ try { clickAudio.currentTime=0; clickAudio.volume=volume; clickAudio.play().catch(()=>{}); } catch(_){} }
-  return true;
-}
-
-// ---------- UI RENDER ----------
+/* ---------- RENDER & DYNAMIC PRICE PREVIEWS ---------- */
 function renderUpgrades(){
   upgradesListEl.innerHTML = '';
   upgradesDefs.forEach(u=>{
     const bought = purchasedUpgrades.has(u.id);
-    const item = document.createElement('div'); item.className='upgradeItem';
-    item.innerHTML = `<div class="left"><div class="name">${u.name}</div><div class="desc">${u.desc}</div></div>
+    const el = document.createElement('div'); el.className='upgradeItem';
+    el.innerHTML = `<div class="left"><div class="name">${u.name}</div><div class="desc">${u.desc}</div></div>
       <div><div style="font-size:13px;color:var(--muted);margin-bottom:6px">${formatNumber(u.cost)}</div>
-      <button ${bought? 'class="bought" disabled': ''} data-id="${u.id}">${bought ? 'Purchased' : 'Buy'}</button></div>`;
-    upgradesListEl.appendChild(item);
+      <button ${bought? 'disabled class="bought"':''} data-id="${u.id}">${bought? 'Purchased':'Buy'}</button></div>`;
+    upgradesListEl.appendChild(el);
   });
   upgradesListEl.querySelectorAll('button').forEach(btn=>{
-    const id = btn.dataset.id;
-    btn.addEventListener('click', ()=> buyUpgrade(id, btn));
+    btn.addEventListener('click',()=>{ const id=btn.dataset.id; buyUpgrade(id,btn); });
   });
 }
 
@@ -497,260 +415,218 @@ function renderBuildings(){
   buildingsList.innerHTML = '';
   buildingDefs.forEach(def=>{
     const state = buildingsState[def.id];
-    const cost = getBuildingCost(def, state.owned);
+    const baseCost = getBuildingCost(def, state.owned);
     const effectivePer = (def.baseCPS * buildingMultiplier);
-    const b = document.createElement('div'); b.className='building';
-    b.innerHTML = `<div class="b-left"><div class="b-icon">${def.name.split(' ').map(s=>s[0]).slice(0,2).join('')}</div>
+    const container = document.createElement('div'); container.className='building';
+    container.innerHTML = `<div class="b-left"><div class="b-icon">${def.name.split(' ').map(s=>s[0]).slice(0,2).join('')}</div>
       <div class="b-info"><div class="name">${def.name}</div><div class="desc">${def.desc}</div></div></div>
-      <div class="b-right"><div class="b-cost">Cost: <strong>${formatNumber(cost)}</strong></div>
-      <div class="b-cost">Gives: <strong>${Number(effectivePer.toFixed(2))}</strong> CPS each</div>
-      <div style="display:flex;gap:8px;align-items:center">
-      <div style="font-size:13px;color:var(--muted);">Owned: <strong>${state.owned}</strong></div>
-      <button class="buyBtn" data-id="${def.id}" data-cost="${cost}">Buy</button>
-      </div></div>`;
-    buildingsList.appendChild(b);
+      <div class="b-right">
+        <div class="b-cost">Cost: <strong>${formatNumber(baseCost)}</strong></div>
+        <div class="b-cost">Gives: <strong>${Number(effectivePer.toFixed(2))}</strong> CPS each</div>
+        <div class="pricePreview" id="preview_${def.id}">—</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="font-size:13px;color:var(--muted)">Owned: <strong>${state.owned}</strong></div>
+          <button class="buyBtn" data-id="${def.id}" data-cost="${baseCost}">Buy</button>
+        </div>
+      </div>`;
+    buildingsList.appendChild(container);
   });
+
+  // wire buy buttons
   document.querySelectorAll('.buyBtn').forEach(btnEl=>{
     const id = btnEl.dataset.id;
-    const cost = Number(btnEl.dataset.cost);
-    btnEl.classList.toggle('buyable', cookies >= cost);
     btnEl.onclick = ()=> attemptBuy(id);
   });
+
+  updateAllPricePreviews();
 }
 
+// update price preview for one building
+function updatePricePreviewFor(def){
+  const state = buildingsState[def.id];
+  const previewEl = document.getElementById(`preview_${def.id}`);
+  if (!previewEl) return;
+  if (multiBuy === 'max'){
+    const mx = getMaxAffordable(def, state.owned, cookies);
+    previewEl.textContent = mx.count > 0 ? `Max: ${mx.count} — ${formatNumber(mx.cost)}` : 'Max: 0';
+  } else {
+    const n = Math.max(1, Number(multiBuy));
+    const total = getCostForN(def, state.owned, n);
+    previewEl.textContent = `${n} × ${formatNumber(getBuildingCost(def, state.owned))} = ${formatNumber(total)}`;
+  }
+  // update buy button availability
+  const btn = document.querySelector(`.buyBtn[data-id="${def.id}"]`);
+  if (btn){
+    const affordable = (multiBuy === 'max') ? (getMaxAffordable(def, state.owned, cookies).count > 0) : (getCostForN(def, state.owned, Number(multiBuy)) <= cookies);
+    btn.classList.toggle('buyable', affordable);
+  }
+}
+
+// update all previews
+function updateAllPricePreviews(){
+  buildingDefs.forEach(def=> updatePricePreviewFor(def));
+  // update global buy preview display (right side)
+  if (multiBuy === 'max'){
+    // compute a simple aggregate: sum of first building's max? show '-' to avoid heavy compute
+    buyPreviewEl.textContent = 'Max per item shown';
+  } else {
+    buyPreviewEl.textContent = `${multiBuy}× preview shown`;
+  }
+}
+
+/* ---------- PURCHASE LOGIC ---------- */
+function attemptBuy(id){
+  const def = buildingDefs.find(d=>d.id===id);
+  if (!def) return;
+  const state = buildingsState[id];
+  let want = multiBuy === 'max' ? getMaxAffordable(def, state.owned, cookies).count : Number(multiBuy);
+  want = Math.max(1, Math.floor(want || 1));
+  // compute total and buy
+  const total = getCostForN(def, state.owned, want);
+  if (total <= cookies && want > 0){
+    cookies -= total;
+    state.owned += want;
+    playSound(); refreshUI();
+  } else {
+    // if couldn't buy full amount, try buy as many as possible
+    const mx = getMaxAffordable(def, state.owned, cookies);
+    if (mx.count > 0){
+      cookies -= mx.cost;
+      state.owned += mx.count;
+      playSound(); refreshUI();
+    } else {
+      // flash
+      const el = document.querySelector(`.buyBtn[data-id="${id}"]`);
+      if (el) { el.style.transform='translateY(-4px)'; setTimeout(()=>el.style.transform='',200); }
+    }
+  }
+}
+
+/* ---------- UPGRADES ---------- */
+function buyUpgrade(id, btnEl){
+  const up = upgradesDefs.find(u=>u.id===id);
+  if (!up) return;
+  if (purchasedUpgrades.has(id)) return;
+  if (cookies < up.cost){ if (btnEl){ btnEl.style.transform='translateY(-4px)'; setTimeout(()=>btnEl.style.transform='',200); } return; }
+  cookies -= up.cost;
+  try{ up.apply(); }catch(e){}
+  purchasedUpgrades.add(id);
+  playSound(); refreshUI();
+}
+
+/* ---------- CLICK & CPS TICK ---------- */
+btn.addEventListener('click', ()=>{
+  btn.style.transform='scale(0.96)';
+  setTimeout(()=>btn.style.transform='',120);
+  const gain = cookiesPerClick * globalCookieMultiplier;
+  cookies += gain; sessionCookies += gain;
+  playSound(); refreshUI();
+});
+setInterval(()=>{ const cps=getCPS(); if (cps>0){ cookies += cps * globalCookieMultiplier; sessionCookies += cps * globalCookieMultiplier; if (cps>=500) playSound(); refreshUI(); } else refreshUI(); },1000);
+
+/* ---------- EXPORT / IMPORT CODE (ONLY persistence) ---------- */
+function getSaveData(){
+  return {
+    version: 3,
+    ts: Date.now(),
+    cookies, sessionCookies, cookiesPerClick,
+    buildingMultiplier, costMultiplier, globalCPSBonus, globalCookieMultiplier,
+    buildings: Object.fromEntries(Object.entries(buildingsState).map(([k,v])=>[k,v.owned])),
+    purchased: Array.from(purchasedUpgrades),
+    settings: { volume: Math.round(volume*100), starName: nameInput.value || 'StarCollector' }
+  };
+}
+function generateExportCode(){
+  try{
+    const json = JSON.stringify(getSaveData());
+    const b64 = btoa(unescape(encodeURIComponent(json)));
+    exportCodeInput.value = b64;
+    return b64;
+  }catch(e){ exportCodeInput.value=''; return ''; }
+}
+document.getElementById('copyCodeBtn').addEventListener('click', async ()=>{
+  const code = generateExportCode();
+  if (!code) return;
+  try{ await navigator.clipboard.writeText(code); copyCodeBtn.textContent='Copied!'; setTimeout(()=>copyCodeBtn.textContent='Copy code',800); }catch(e){ exportCodeInput.select(); document.execCommand('copy'); copyCodeBtn.textContent='Copied!'; setTimeout(()=>copyCodeBtn.textContent='Copy code',800); }
+});
+
+// Generate code button (saveNow) — note: this does NOT write to localStorage
+document.getElementById('saveNow').addEventListener('click', ()=>{
+  generateExportCode();
+  saveNowBtn.textContent='Code ready';
+  setTimeout(()=> saveNowBtn.textContent='Generate Code',1200);
+});
+
+// Import flow
+document.getElementById('importBtn').addEventListener('click', ()=>{
+  const code = importInput.value.trim();
+  if (!code){ alert('Paste a code to import'); return; }
+  let data = null;
+  try{ const str = decodeURIComponent(escape(atob(code))); data = JSON.parse(str); } catch(e){
+    try{ const str2 = atob(code); data = JSON.parse(str2); } catch(err){ alert('Invalid code'); return; }
+  }
+  if (!data || typeof data !== 'object') { alert('Invalid data'); return; }
+  if (!confirm('Import will overwrite your current local progress. Continue?')) return;
+  try{
+    cookies = Number(data.cookies) || 0;
+    sessionCookies = Number(data.sessionCookies) || 0;
+    cookiesPerClick = Number(data.cookiesPerClick) || 1;
+    buildingMultiplier = Number(data.buildingMultiplier) || 1.0;
+    costMultiplier = Number(data.costMultiplier) || 1.0;
+    globalCPSBonus = Number(data.globalCPSBonus) || 0;
+    globalCookieMultiplier = Number(data.globalCookieMultiplier) || 1.0;
+    if (data.buildings && typeof data.buildings==='object'){
+      for(const [id,n] of Object.entries(data.buildings)){ if (buildingsState[id]) buildingsState[id].owned = Number(n)||0; }
+    }
+    purchasedUpgrades.clear();
+    if (Array.isArray(data.purchased)) data.purchased.forEach(id=>purchasedUpgrades.add(id));
+    if (data.settings && typeof data.settings === 'object'){
+      volume = (Number(data.settings.volume)||80)/100;
+      nameInput.value = data.settings.starName || 'StarCollector';
+    }
+    clickAudio.volume = volume;
+    generateExportCode(); refreshUI(); alert('Import applied.');
+  }catch(e){ console.warn('Import error', e); alert('Import failed'); }
+});
+
+/* ---------- WIPE (local session only) ---------- */
+document.getElementById('wipeBtn').addEventListener('click', ()=>{ confirmWipe.style.display='flex'; });
+confirmWipeNo.addEventListener('click', ()=>{ confirmWipe.style.display='none'; });
+confirmWipeYes.addEventListener('click', ()=>{
+  cookies=0; sessionCookies=0; cookiesPerClick=1; buildingMultiplier=1.0; costMultiplier=1.0; globalCPSBonus=0; globalCookieMultiplier=1.0;
+  for(const id in buildingsState) buildingsState[id].owned = 0;
+  purchasedUpgrades.clear();
+  volume = 0.8; nameInput.value = 'StarCollector'; clickAudio.volume = volume;
+  confirmWipe.style.display='none'; generateExportCode(); refreshUI();
+});
+
+/* ---------- SETTINGS UI ---------- */
+settingsBtnEl.addEventListener('click', ()=>{ settingsModal.style.display='flex'; settingsModal.setAttribute('aria-hidden','false'); });
+settingsClose.addEventListener('click', ()=>{ settingsModal.style.display='none'; settingsModal.setAttribute('aria-hidden','true'); });
+volumeRange.addEventListener('input', e=>{ volume = Number(e.target.value)/100; clickAudio.volume = volume; generateExportCode(); });
+
+// ---------- helpers ----------
 function refreshUI(){
   totalEl.textContent = formatNumber(Math.floor(cookies));
   metaTotal.textContent = formatNumber(Math.floor(cookies));
   metaSession.textContent = formatNumber(Math.floor(sessionCookies));
   cpsEl.textContent = Number(getCPS().toFixed(2));
   cpcEl.textContent = cookiesPerClick;
-  starNameEl.textContent = starName;
+  starNameEl.textContent = nameInput.value || 'StarCollector';
   renderUpgrades();
   renderBuildings();
-  generateExportCode(); // update code live
+  updateAllPricePreviews();
+  generateExportCode();
 }
 
-// ---------- PURCHASES & MULTIBUY ----------
-function getCostForN(def, owned, n){
-  let total = 0;
-  for(let i=0;i<n;i++) total += getBuildingCost(def, owned + i);
-  return total;
-}
-function getMaxAffordable(def, owned, available){
-  let n=0, cost=0;
-  const cap = 1000000;
-  while(n < cap){
-    const next = getBuildingCost(def, owned + n);
-    if (cost + next <= available){ cost += next; n++; } else break;
-  }
-  return {count:n, cost};
-}
-function attemptBuy(id){
-  const def = buildingDefs.find(d=>d.id===id);
-  if(!def) return;
-  const state = buildingsState[id];
-  let want = multiBuy === 'max' ? getMaxAffordable(def, state.owned, cookies).count : Number(multiBuy);
-  if (!want || want <= 0){ flashButton(document.querySelector(`.buyBtn[data-id="${id}"]`)); return; }
-  // cap reasonable to avoid infinite loops
-  want = Math.max(1, Math.min(100000, Math.floor(want)));
-  const totalCost = getCostForN(def, state.owned, want);
-  if (totalCost <= cookies){
-    cookies -= totalCost;
-    state.owned += want;
-    playSound(); refreshUI(); saveGame();
-  } else {
-    // try smaller: greedy buy as many as possible
-    const mx = getMaxAffordable(def, state.owned, cookies);
-    if (mx.count > 0){
-      cookies -= mx.cost;
-      state.owned += mx.count;
-      playSound(); refreshUI(); saveGame();
-    } else {
-      flashButton(document.querySelector(`.buyBtn[data-id="${id}"]`));
-    }
-  }
-}
-
-// upgrade buy (one-time)
-function buyUpgrade(id, btnEl){
-  const up = upgradesDefs.find(u=>u.id===id);
-  if (!up) return;
-  if (purchasedUpgrades.has(id)){ return; }
-  if (cookies < up.cost){ flashButton(btnEl); return; }
-  cookies -= up.cost;
-  // apply effect
-  try { up.apply(); } catch(e){ console.warn('Upgrade apply error', e); }
-  purchasedUpgrades.add(id);
-  playSound(); refreshUI(); saveGame();
-}
-
-// ---------- CLICK & CPS TICK ----------
-btn.addEventListener('click', ()=>{
-  btn.style.transform = "scale(0.96)";
-  setTimeout(()=> btn.style.transform = "",120);
-  const gain = cookiesPerClick * globalCookieMultiplier;
-  cookies += gain;
-  sessionCookies += gain;
-  playSound(); refreshUI(); saveGame();
-});
-setInterval(()=>{
-  const cps = getCPS();
-  if (cps > 0){
-    cookies += cps * globalCookieMultiplier;
-    sessionCookies += cps * globalCookieMultiplier;
-    if (cps >= 500) playSound();
-    refreshUI(); saveGame();
-  } else refreshUI();
-},1000);
-
-// ---------- SAVE / LOAD / WIPE ----------
-function getSaveData(){
-  return {
-    version:2,
-    ts:Date.now(),
-    cookies, sessionCookies, cookiesPerClick, clickUpgradeLevel, effUpgradeLevel,
-    buildingMultiplier, costMultiplier, globalCPSBonus, globalCookieMultiplier,
-    buildings: Object.fromEntries(Object.entries(buildingsState).map(([k,v])=>[k,v.owned])),
-    purchased: Array.from(purchasedUpgrades),
-    settings:{volume:Math.round(volume*100), starName}
-  };
-}
-function saveGame(){
-  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(getSaveData())); generateExportCode(); } catch(e){ console.warn('Save failed', e); }
-}
-function loadGame(){
-  try{
-    const raw = localStorage.getItem(SAVE_KEY);
-    if (!raw) return;
-    const data = JSON.parse(raw);
-    cookies = Number(data.cookies) || 0; sessionCookies = Number(data.sessionCookies) || 0;
-    cookiesPerClick = Number(data.cookiesPerClick) || 1;
-    clickUpgradeLevel = Number(data.clickUpgradeLevel) || 0;
-    effUpgradeLevel = Number(data.effUpgradeLevel) || 0;
-    buildingMultiplier = Number(data.buildingMultiplier) || 1.0;
-    costMultiplier = Number(data.costMultiplier) || 1.0;
-    globalCPSBonus = Number(data.globalCPSBonus) || 0;
-    globalCookieMultiplier = Number(data.globalCookieMultiplier) || 1.0;
-    if (data.buildings){ for(const [id, n] of Object.entries(data.buildings)){ if (buildingsState[id]) buildingsState[id].owned = Number(n) || 0; } }
-    purchasedUpgrades.clear();
-    if (Array.isArray(data.purchased)) data.purchased.forEach(id=>purchasedUpgrades.add(id));
-    if (data.settings){
-      if (typeof data.settings.volume !== 'undefined'){ volume = (Number(data.settings.volume)||80)/100; localStorage.setItem(LS_VOLUME, Math.round(volume*100)); if (typeof volumeRange !== 'undefined') volumeRange.value = Math.round(volume*100); }
-      if (typeof data.settings.starName === 'string'){ starName = data.settings.starName || 'StarCollector'; localStorage.setItem(LS_NAME, starName); if (typeof nameInput !== 'undefined') nameInput.value = starName; }
-    }
-  } catch(e){ console.warn('Load failed', e); }
-}
-
-// wipe confirm
-document.getElementById('wipeBtn').addEventListener('click', ()=>{ confirmWipe.style.display='flex'; });
-confirmWipeNo.addEventListener('click', ()=>{ confirmWipe.style.display='none'; });
-confirmWipeYes.addEventListener('click', ()=>{
-  localStorage.removeItem(SAVE_KEY); localStorage.removeItem(LS_VOLUME); localStorage.removeItem(LS_NAME);
-  // reset core state
-  cookies = 0; sessionCookies = 0; cookiesPerClick = 1; clickUpgradeLevel = 0; effUpgradeLevel = 0;
-  buildingMultiplier = 1.0; costMultiplier = 1.0; globalCPSBonus = 0; globalCookieMultiplier = 1.0;
-  for (const id in buildingsState) buildingsState[id].owned = 0;
-  purchasedUpgrades.clear();
-  volume = 0.8; localStorage.setItem(LS_VOLUME, Math.round(volume*100)); volumeRange.value = Math.round(volume*100);
-  starName = 'StarCollector'; localStorage.setItem(LS_NAME, starName); nameInput.value = starName; starNameEl.textContent = starName;
-  clickAudio.volume = volume;
-  confirmWipe.style.display='none';
-  refreshUI(); saveGame(); generateExportCode();
-});
-
-// Save Now
-saveNowBtn.addEventListener('click', ()=>{ saveGame(); saveNowBtn.textContent='Saved'; setTimeout(()=>saveNowBtn.textContent='Save Now',900); });
-
-// autosave
-setInterval(saveGame, 10000);
-window.addEventListener('beforeunload', saveGame);
-
-// ---------- EXPORT / IMPORT CODE ----------
-function generateExportCode(){
-  const data = getSaveData();
-  // JSON -> UTF8 -> base64
-  try{
-    const json = JSON.stringify(data);
-    const b64 = btoa(unescape(encodeURIComponent(json)));
-    exportCodeInput.value = b64;
-    return b64;
-  } catch(e){
-    console.warn('Export failed', e);
-    exportCodeInput.value = '';
-    return '';
-  }
-}
-copyCodeBtn.addEventListener('click', async ()=>{
-  const code = exportCodeInput.value;
-  if (!code) return;
-  try{
-    await navigator.clipboard.writeText(code);
-    copyCodeBtn.textContent = 'Copied!';
-    setTimeout(()=> copyCodeBtn.textContent = 'Copy code', 900);
-  } catch(e){
-    // fallback select
-    exportCodeInput.select();
-    document.execCommand('copy');
-    copyCodeBtn.textContent = 'Copied!';
-    setTimeout(()=> copyCodeBtn.textContent = 'Copy code', 900);
-  }
-});
-
-// import flow: paste -> parse -> confirm -> apply (overwrites current save)
-importBtn.addEventListener('click', ()=>{
-  const code = importInput.value.trim();
-  if (!code) { alert('Paste a code first'); return; }
-  let json = null;
-  try{
-    const str = decodeURIComponent(escape(atob(code)));
-    json = JSON.parse(str);
-  } catch(e){
-    try { // some older clients may have used direct btoa, attempt a different decode
-      const str2 = atob(code);
-      json = JSON.parse(str2);
-    } catch(err){
-      alert('Invalid code — could not parse.');
-      return;
-    }
-  }
-  if (!json || typeof json !== 'object'){ alert('Invalid code data'); return; }
-  if (!confirm('Importing this code will overwrite your current progress. Proceed?')) return;
-  // apply imported data (map fields)
-  try{
-    cookies = Number(json.cookies) || 0; sessionCookies = Number(json.sessionCookies) || 0;
-    cookiesPerClick = Number(json.cookiesPerClick) || 1;
-    clickUpgradeLevel = Number(json.clickUpgradeLevel) || 0;
-    effUpgradeLevel = Number(json.effUpgradeLevel) || 0;
-    buildingMultiplier = Number(json.buildingMultiplier) || 1.0;
-    costMultiplier = Number(json.costMultiplier) || 1.0;
-    globalCPSBonus = Number(json.globalCPSBonus) || 0;
-    globalCookieMultiplier = Number(json.globalCookieMultiplier) || 1.0;
-    if (json.buildings && typeof json.buildings === 'object'){
-      for (const [id,n] of Object.entries(json.buildings)){ if (buildingsState[id]) buildingsState[id].owned = Number(n) || 0; }
-    }
-    purchasedUpgrades.clear();
-    if (Array.isArray(json.purchased)) json.purchased.forEach(id=>purchasedUpgrades.add(id));
-    if (json.settings){
-      if (typeof json.settings.volume !== 'undefined'){ volume = (Number(json.settings.volume)||80)/100; localStorage.setItem(LS_VOLUME, Math.round(volume*100)); volumeRange.value = Math.round(volume*100); }
-      if (typeof json.settings.starName === 'string'){ starName = json.settings.starName || 'StarCollector'; localStorage.setItem(LS_NAME, starName); nameInput.value = starName; starNameEl.textContent = starName; }
-    }
-    refreshUI(); saveGame(); alert('Import successful!');
-  } catch(e){ console.warn('Import apply failed', e); alert('Import failed'); }
-});
-
-// ---------- UTIL & UI HELPERS ----------
-function flashButton(el){ if (!el) return; el.style.transform="translateY(-4px)"; el.style.boxShadow="0 8px 22px rgba(255,0,80,0.08)"; setTimeout(()=>{ el.style.transform=""; el.style.boxShadow=""; },220); }
-
-// ---------- INITIAL RENDER & START ----------
+/* ---------- initial render ---------- */
 renderUpgrades();
 renderBuildings();
-refreshUI();
+generateExportCode();
 clickAudio.volume = volume;
 
-// keyboard & small UI behavior
-document.addEventListener('keydown',(e)=>{ if (e.key === 'Escape'){ settingsModal.style.display='none'; settingsModal.setAttribute('aria-hidden','true'); confirmWipe.style.display='none'; } });
-nameInput.addEventListener('blur', ()=>{ localStorage.setItem(LS_NAME, nameInput.value.slice(0,20) || 'StarCollector'); generateExportCode(); saveGame(); });
-settingsModal.addEventListener('click',(e)=>{ if (e.target === settingsModal) { settingsModal.style.display='none'; settingsModal.setAttribute('aria-hidden','true'); } });
+// keyboard helpers
+document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape'){ settingsModal.style.display='none'; settingsModal.setAttribute('aria-hidden','true'); confirmWipe.style.display='none'; } });
 
 </script>
 </body>
