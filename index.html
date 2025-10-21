@@ -4,25 +4,20 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>BoringClicker</title>
-
 <style>
   :root{
     --bg1: rgba(15,23,36,0.72);
     --bg2: rgba(16,42,67,0.72);
-    --glass: rgba(255,255,255,0.04);
-    --glass-2: rgba(255,255,255,0.02);
     --glass-border: rgba(255,255,255,0.06);
     --muted: #bfc9d9;
     --glass-radius: 14px;
     --accent1: #ffd36b;
     --accent2: #ff8ab6;
   }
-
-  /* Reset & base */
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
   body{
-    /* Background image (SpaceBackground.jfif) with dark gradient overlay for contrast */
+    /* background uses SpaceBackground.jfif; it's preloaded by script before revealing UI */
     background:
       radial-gradient(1200px 600px at 10% 10%, rgba(255,138,182,0.06), transparent 8%),
       linear-gradient(180deg, var(--bg1), var(--bg2)),
@@ -32,13 +27,48 @@
     background-position: center;
     background-repeat: no-repeat;
     color:#e6eef8;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
     display:flex;
     align-items:center;
     justify-content:center;
     padding:36px;
     min-height:100vh;
+  }
+
+  /* Loading overlay */
+  #loadingOverlay{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(180deg, rgba(2,6,23,0.85), rgba(2,6,23,0.9));
+    z-index:9999;
+    flex-direction:column;
+    gap:18px;
+    color:#eaf2ff;
+  }
+  #loadingBox{
+    width:520px;
+    max-width:90%;
+    padding:18px;
+    border-radius:12px;
+    background: rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.05);
+    text-align:center;
+  }
+  #loadingBarWrap{
+    width:100%;
+    background: rgba(255,255,255,0.03);
+    border-radius:12px;
+    padding:6px;
+    margin-top:12px;
+  }
+  #loadingBar{
+    height:14px;
+    width:0%;
+    border-radius:8px;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    transition: width 300ms ease;
   }
 
   /* Main container */
@@ -48,16 +78,16 @@
     display:flex;
     gap:28px;
     align-items:flex-start;
+    z-index:1;
   }
 
-  /* Panel common */
   .panel{
     background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
     border:1px solid var(--glass-border);
-    backdrop-filter: blur(8px);
-    padding:20px;
+    backdrop-filter: blur(6px);
+    padding:18px;
     border-radius: var(--glass-radius);
-    box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+    box-shadow: 0 8px 30px rgba(2,6,23,0.55);
   }
 
   /* Left panel */
@@ -65,170 +95,93 @@
     width:380px;
     display:flex;
     flex-direction:column;
-    gap:14px;
+    gap:12px;
   }
+  .titleRow{display:flex;align-items:center;justify-content:space-between}
+  h1{margin:0;font-size:20px;letter-spacing:0.6px}
+  .sub{color:var(--muted);font-size:13px}
 
-  .titleRow{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-  }
-  h1{
-    margin:0;
-    font-size:20px;
-    letter-spacing:0.6px;
-  }
-  .sub{
-    color:var(--muted);
-    font-size:13px;
-  }
+  #totalCookies{font-size:34px;margin-top:6px;font-weight:700;color:#fff;text-shadow: 0 6px 18px rgba(0,0,0,0.6);}
 
-  #totalCookies{
-    font-size:36px;
-    margin-top:6px;
-    font-weight:700;
-    color: #fff;
-    text-shadow: 0 6px 18px rgba(0,0,0,0.6);
-  }
-
-  .metaRow{
-    display:flex;
-    gap:10px;
-    margin-top:6px;
-  }
-  .meta{
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border: 1px solid rgba(255,255,255,0.03);
-    padding:10px 12px;
-    border-radius:10px;
-    font-size:13px;
-    min-width:120px;
-    text-align:left;
-  }
+  .metaRow{display:flex;gap:10px;margin-top:6px}
+  .meta{background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border: 1px solid rgba(255,255,255,0.03);padding:10px 12px;border-radius:10px;font-size:13px;min-width:120px;text-align:left}
   .meta strong{display:block;font-size:15px;color:#fff}
 
-  /* Buildings list */
+  /* Upgrades area */
+  #upgrades{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+  .upgrade{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.015)}
+  .upgrade .left{display:flex;flex-direction:column}
+  .upgrade .name{font-weight:800}
+  .upgrade .desc{font-size:12px;color:var(--muted)}
+  .upgrade button{background:transparent;border:1px solid rgba(255,255,255,0.08);color:#fff;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:700}
+  .upgrade button.buyable{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#082032;border:none;box-shadow:0 6px 22px rgba(255,138,182,0.12)}
+
+  /* Buildings list - scrollable */
+  #buildingsWrap{margin-top:10px}
   #buildingsList{
-    margin-top:10px;
+    margin-top:6px;
     display:flex;
     flex-direction:column;
     gap:10px;
+    max-height:320px;         /* <-- scrollable area */
+    overflow-y:auto;
+    padding-right:8px;
   }
-  .building{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:12px;
-    border-radius:10px;
-    background:var(--glass-2);
-    border:1px solid rgba(255,255,255,0.015);
-    gap:10px;
-  }
-  .b-left{
-    display:flex;
-    gap:10px;
-    align-items:center;
-  }
-  .b-icon{
-    width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,var(--accent1),var(--accent2));
-    display:flex;align-items:center;justify-content:center;font-weight:800;color:#082032;
-    box-shadow: 0 6px 18px rgba(255,138,182,0.08);
-  }
+  .building{display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.015);gap:10px}
+  .b-left{display:flex;gap:10px;align-items:center}
+  .b-icon{width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#082032;box-shadow:0 6px 18px rgba(255,138,182,0.08)}
   .b-info{display:flex;flex-direction:column}
   .b-info .name{font-weight:800}
   .b-info .desc{font-size:12px;color:var(--muted)}
   .b-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
   .b-cost{font-size:13px;color:var(--muted)}
-  .buyBtn{
-    background:transparent;border:1px solid rgba(255,255,255,0.08);color:#fff;padding:6px 10px;border-radius:10px;cursor:pointer;font-weight:700;
-    transition:transform .12s ease, box-shadow .12s ease, background .12s;
-  }
-  .buyBtn.buyable{
-    background: linear-gradient(90deg,var(--accent1),var(--accent2));
-    color:#082032;border:none;box-shadow: 0 6px 22px rgba(255,138,182,0.12);
-  }
+  .buyBtn{background:transparent;border:1px solid rgba(255,255,255,0.08);color:#fff;padding:6px 10px;border-radius:10px;cursor:pointer;font-weight:700}
+  .buyBtn.buyable{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#082032;border:none;box-shadow:0 6px 22px rgba(255,138,182,0.12)}
 
-  /* Right panel - big star */
-  #rightPanel{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:flex-start;
-    width:100%;
-    max-width:660px;
-  }
-
-  #starCard{
-    width:100%;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:28px;
-    border-radius:18px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border:1px solid rgba(255,255,255,0.04);
-    box-shadow: 0 12px 40px rgba(2,6,23,0.55);
-  }
-
-  #cookieBtn{
-    width:260px;
-    max-width:60%;
-    cursor:pointer;
-    user-select:none;
-    transform-origin:center;
-    transition: transform .12s ease, filter .12s ease;
-    will-change:transform;
-  }
+  /* Right panel */
+  #rightPanel{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;width:100%;max-width:660px}
+  #starCard{width:100%;display:flex;justify-content:center;align-items:center;padding:28px;border-radius:18px;background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 40px rgba(2,6,23,0.55)}
+  #cookieBtn{width:260px;max-width:60%;cursor:pointer;user-select:none;transform-origin:center;transition: transform .12s ease, filter .12s ease}
   #cookieBtn:hover{ transform:translateY(-6px) rotate(-2deg) }
   #cookieBtn:active{ transform:scale(.94) rotate(0deg) }
 
-  /* small stats below star */
-  #starStats{
-    margin-top:14px;
-    display:flex;
-    gap:18px;
-    align-items:center;
-    justify-content:center;
-  }
-  .stat{
-    text-align:center;
-    padding:8px 14px;
-    border-radius:12px;
-    background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border:1px solid rgba(255,255,255,0.03);
-    min-width:140px;
-  }
+  #starStats{margin-top:14px;display:flex;gap:18px;align-items:center;justify-content:center}
+  .stat{text-align:center;padding:8px 14px;border-radius:12px;background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);min-width:140px}
   .stat .label{ font-size:12px; color:var(--muted); }
   .stat .value{ margin-top:6px; font-size:18px; font-weight:800; color:#fff}
 
-  /* footer hint */
-  .hint{
-    margin-top:16px;
-    text-align:center;
-    color:var(--muted);
-    font-size:13px;
-  }
+  .hint{margin-top:12px;text-align:center;color:var(--muted);font-size:13px}
 
-  /* responsive */
   @media (max-width:920px){
     #gameWrap{flex-direction:column;align-items:center}
     #leftPanel{width:100%;max-width:680px}
     #rightPanel{width:100%}
     #cookieBtn{width:220px}
+    #buildingsList{max-height:260px}
   }
 </style>
 </head>
-
 <body>
-  <div id="gameWrap">
-    <!-- LEFT: info & buildings -->
+  <!-- Loading overlay -->
+  <div id="loadingOverlay">
+    <div id="loadingBox">
+      <div style="font-size:20px;font-weight:800">BoringClicker</div>
+      <div style="margin-top:8px;color:var(--muted)">Loading assets — please wait</div>
+      <div id="loadingBarWrap"><div id="loadingBar"></div></div>
+      <div id="loadingPercent" style="margin-top:8px;color:var(--muted)">0%</div>
+    </div>
+  </div>
+
+  <!-- Main game (hidden behind overlay until loaded) -->
+  <div id="gameWrap" style="visibility:hidden;opacity:0;transition:opacity .4s ease">
+    <!-- LEFT -->
     <div id="leftPanel" class="panel">
       <div class="titleRow">
         <div>
           <h1>BoringClicker</h1>
-          <div class="sub">Buy space things — they produce cookies per second</div>
+          <div class="sub">Buy space things — produce cookies per second</div>
         </div>
-        <div class="sub" style="text-align:right">v1.1</div>
+        <div class="sub" style="text-align:right">v1.2</div>
       </div>
 
       <div id="totalCookies">0</div>
@@ -237,9 +190,8 @@
         <div class="meta">
           <div class="label">Cookies</div>
           <strong id="metaTotal">0</strong>
-          <div class="cost">Total cookies available</div>
+          <div class="cost">Available cookies</div>
         </div>
-
         <div class="meta">
           <div class="label">Session</div>
           <strong id="metaSession">0</strong>
@@ -247,18 +199,47 @@
         </div>
       </div>
 
-      <div style="margin-top:12px">
-        <div class="sub" style="margin-bottom:8px">Buildings</div>
-        <div id="buildingsList"></div>
+      <!-- Upgrades -->
+      <div style="margin-top:8px">
+        <div class="sub" style="margin-bottom:6px">Upgrades</div>
+        <div id="upgrades" aria-live="polite">
+          <!-- Click upgrade -->
+          <div class="upgrade">
+            <div class="left">
+              <div class="name">Upgrade Click</div>
+              <div class="desc">Increase cookies per click by +1 (scales)</div>
+            </div>
+            <div>
+              <button id="buyClickUpgrade">Buy (5000)</button>
+            </div>
+          </div>
+
+          <!-- Building efficiency -->
+          <div class="upgrade">
+            <div class="left">
+              <div class="name">Building Efficiency</div>
+              <div class="desc">Increase all building CPS by +10% per level</div>
+            </div>
+            <div>
+              <button id="buyEffUpgrade">Buy (15000)</button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="hint">Tip: Put <code>StarClickMain.png</code> and <code>SpaceBackground.jfif</code> beside this file in your repo.</div>
+      <!-- Buildings (scrollable) -->
+      <div id="buildingsWrap">
+        <div class="sub" style="margin-top:10px">Buildings</div>
+        <div id="buildingsList" role="list"></div>
+      </div>
+
+      <div class="hint">Put <code>StarClickMain.png</code> and <code>SpaceBackground.jfif</code> next to this file in your repo.</div>
     </div>
 
-    <!-- RIGHT: big clickable star -->
+    <!-- RIGHT -->
     <div id="rightPanel">
       <div id="starCard" class="panel">
-        <img id="cookieBtn" src="StarClickMain.png" alt="StarClickMain">
+        <img id="cookieBtn" src="StarClickMain.png" alt="StarClickMain" draggable="false">
       </div>
 
       <div id="starStats">
@@ -275,36 +256,87 @@
   </div>
 
 <script>
-/* BoringClicker v1.1
-   Single-file game. Put StarClickMain.png and SpaceBackground.jfif next to this file.
-   New buildings: Space Rocket, Satellite, Space Station, Telescope, Solar Probe,
-   plus some fake planets (Tiny Planet, Gas Giant, Alien Megaplanet).
-   Price scales with number owned (exponential).
+/* BoringClicker v1.2
+  - Loading screen that waits for StarClickMain.png and SpaceBackground.jfif to load.
+  - Start with 0 CPS (basePassiveCPS = 0).
+  - Added upgrades: click upgrade (expensive) and building efficiency (expensive).
+  - Buildings list is scrollable (max-height set in CSS).
+  - All in one file.
 */
 
-// GAME STATE
+/* ---------- ASSET LOADING (loading screen) ---------- */
+// list of assets to wait for
+const assets = ['StarClickMain.png', 'SpaceBackground.jfif'];
+let assetsLoaded = 0;
+
+const loadingOverlay = document.getElementById('loadingOverlay');
+const loadingBar = document.getElementById('loadingBar');
+const loadingPercent = document.getElementById('loadingPercent');
+const gameWrap = document.getElementById('gameWrap');
+
+function updateLoadingProgress(){
+  const pct = Math.round((assetsLoaded / assets.length) * 100);
+  loadingBar.style.width = pct + '%';
+  loadingPercent.textContent = pct + '%';
+}
+
+// preload images and wait
+assets.forEach(src => {
+  const img = new Image();
+  img.src = src;
+  img.onload = () => {
+    assetsLoaded++;
+    updateLoadingProgress();
+    if (assetsLoaded === assets.length) {
+      // small delay for polish
+      setTimeout(()=> {
+        loadingOverlay.style.transition = 'opacity .4s ease';
+        loadingOverlay.style.opacity = 0;
+        setTimeout(()=> loadingOverlay.remove(), 420);
+        // reveal game
+        gameWrap.style.visibility = 'visible';
+        gameWrap.style.opacity = '1';
+      }, 350);
+    }
+  };
+  img.onerror = () => {
+    // If asset fails to load, still progress so user can play (but warn in console)
+    console.warn('Failed to load asset:', src);
+    assetsLoaded++;
+    updateLoadingProgress();
+    if (assetsLoaded === assets.length) {
+      setTimeout(()=> {
+        loadingOverlay.style.opacity = 0;
+        setTimeout(()=> loadingOverlay.remove(), 420);
+        gameWrap.style.visibility = 'visible';
+        gameWrap.style.opacity = '1';
+      }, 350);
+    }
+  };
+});
+
+/* ---------- GAME STATE ---------- */
 let cookies = 0;
 let sessionCookies = 0;
-let cookiesPerClick = 1; // CPC for clicking the star
-
-// building definitions: name, baseCost, baseCPS
-const buildingDefs = [
-  { id: 'telescope', name: 'Telescope', baseCost: 50, baseCPS: 1.5, desc: 'Basic science: small CPS' },
-  { id: 'space_rocket', name: 'Space Rocket', baseCost: 120, baseCPS: 6, desc: 'Cheap rockets launching probes' },
-  { id: 'satellite', name: 'Satellite', baseCost: 700, baseCPS: 40, desc: 'Orbiting machines, steady income' },
-  { id: 'space_station', name: 'Space Station', baseCost: 3500, baseCPS: 260, desc: 'Big orbital platform' },
-  { id: 'solar_probe', name: 'Solar Probe', baseCost: 12000, baseCPS: 1200, desc: 'Expensive probes close to stars' },
-  // fake planets (plural)
-  { id: 'tiny_planet', name: 'Tiny Planet', baseCost: 45000, baseCPS: 6000, desc: 'Small artificial world' },
-  { id: 'gas_giant', name: 'Gas Giant', baseCost: 250000, baseCPS: 35000, desc: 'Huge yields but very expensive' },
-  { id: 'alien_megaplanet', name: 'Alien Megaplanet', baseCost: 2000000, baseCPS: 300000, desc: 'Mega investment: massive CPS' }
+let cookiesPerClick = 1; // initial CPC
+let clickUpgradeLevel = 0; // number of click upgrades purchased
+let effUpgradeLevel = 0;   // building efficiency levels (each +10%)
+let buildingDefs = [
+  { id: 'telescope', name: 'Telescope', baseCost: 500, baseCPS: 1.5, desc: 'Basic science: small CPS' },
+  { id: 'space_rocket', name: 'Space Rocket', baseCost: 2500, baseCPS: 9, desc: 'Rockets launching probes' },
+  { id: 'satellite', name: 'Satellite', baseCost: 15000, baseCPS: 80, desc: 'Orbiting machines, steady income' },
+  { id: 'space_station', name: 'Space Station', baseCost: 120000, baseCPS: 700, desc: 'Big orbital platform' },
+  { id: 'solar_probe', name: 'Solar Probe', baseCost: 650000, baseCPS: 3600, desc: 'Expensive probes near stars' },
+  { id: 'tiny_planet', name: 'Tiny Planet', baseCost: 4000000, baseCPS: 20000, desc: 'Small artificial world' },
+  { id: 'gas_giant', name: 'Gas Giant', baseCost: 30000000, baseCPS: 150000, desc: 'Huge yields but very expensive' },
+  { id: 'alien_megaplanet', name: 'Alien Megaplanet', baseCost: 250000000, baseCPS: 1200000, desc: 'Mega investment: massive CPS' }
 ];
 
-// dynamic state per building
+// per-building owned count
 const buildingsState = {};
 buildingDefs.forEach(b => buildingsState[b.id] = { owned: 0 });
 
-// UI refs
+/* ---------- UI REFERENCES ---------- */
 const totalEl = document.getElementById('totalCookies');
 const metaTotal = document.getElementById('metaTotal');
 const metaSession = document.getElementById('metaSession');
@@ -313,7 +345,10 @@ const cpcEl = document.getElementById('cpcValue');
 const btn = document.getElementById('cookieBtn');
 const buildingsList = document.getElementById('buildingsList');
 
-// helpers
+const buyClickUpgradeBtn = document.getElementById('buyClickUpgrade');
+const buyEffUpgradeBtn = document.getElementById('buyEffUpgrade');
+
+/* ---------- HELPERS ---------- */
 function pretty(n){
   if (n >= 1_000_000_000) return (n/1_000_000_000).toFixed(2) + 'b';
   if (n >= 1_000_000) return (n/1_000_000).toFixed(2) + 'm';
@@ -321,34 +356,51 @@ function pretty(n){
   return Math.floor(n).toString();
 }
 
-// pricing formula: baseCost * (1.15 ^ owned)
-function getCost(def, owned){
+// building cost formula: baseCost * (1.15 ^ owned)
+function getBuildingCost(def, owned){
   return Math.ceil(def.baseCost * Math.pow(1.15, owned));
 }
 
-// compute total CPS from buildings + small basePassiveCPS
-const basePassiveCPS = 0.1; // tiny passive
-function getCPS(){
-  let total = basePassiveCPS;
-  for (const def of buildingDefs){
-    const state = buildingsState[def.id];
-    total += state.owned * def.baseCPS;
-  }
-  return total;
+// upgrade costs formula (scaling)
+// click upgrade cost grows fast to avoid OP early: base 5000 * (3 ^ level)
+function getClickUpgradeCost(level){
+  return Math.ceil(5000 * Math.pow(3, level));
+}
+// efficiency upgrade cost: base 15000 * (2.5 ^ level)
+function getEffUpgradeCost(level){
+  return Math.ceil(15000 * Math.pow(2.5, level));
 }
 
-// render buildings UI dynamically
+// get total building CPS including efficiency multiplier
+function getBuildingCPS(){
+  let total = 0;
+  for (const def of buildingDefs){
+    const owned = buildingsState[def.id].owned;
+    const base = owned * def.baseCPS;
+    total += base;
+  }
+  // apply efficiency upgrade: each level = +10% => multiplier = 1 + 0.1 * effUpgradeLevel
+  const multiplier = 1 + 0.1 * effUpgradeLevel;
+  return total * multiplier;
+}
+
+// total CPS (start at zero unless buildings bought)
+function getCPS(){
+  return getBuildingCPS(); // basePassive = 0
+}
+
+/* ---------- RENDER UI ---------- */
 function renderBuildings(){
   buildingsList.innerHTML = '';
   buildingDefs.forEach(def => {
     const state = buildingsState[def.id];
-    const cost = getCost(def, state.owned);
+    const cost = getBuildingCost(def, state.owned);
+    const effectivePer = (def.baseCPS * (1 + 0.1 * effUpgradeLevel)).toFixed(1);
     const b = document.createElement('div');
     b.className = 'building';
-
     b.innerHTML = `
       <div class="b-left">
-        <div class="b-icon">${def.name.split(' ').map(s=>s[0]).slice(0,2).join('')}</div>
+        <div class="b-icon" aria-hidden="true">${def.name.split(' ').map(s=>s[0]).slice(0,2).join('')}</div>
         <div class="b-info">
           <div class="name">${def.name}</div>
           <div class="desc">${def.desc}</div>
@@ -356,7 +408,7 @@ function renderBuildings(){
       </div>
       <div class="b-right">
         <div class="b-cost">Cost: <strong>${pretty(cost)}</strong></div>
-        <div class="b-cost">Gives: <strong>${def.baseCPS}</strong> CPS each</div>
+        <div class="b-cost">Gives: <strong>${effectivePer}</strong> CPS each</div>
         <div style="display:flex;gap:8px;align-items:center">
           <div style="font-size:13px;color:var(--muted);">Owned: <strong>${state.owned}</strong></div>
           <button class="buyBtn" data-id="${def.id}" data-cost="${cost}">Buy</button>
@@ -365,21 +417,51 @@ function renderBuildings(){
     `;
     buildingsList.appendChild(b);
   });
-  // wire buy buttons
+  // wire buy buttons and toggles
   document.querySelectorAll('.buyBtn').forEach(btnEl=>{
-    const id = btnEl.getAttribute('data-id');
-    const cost = Number(btnEl.getAttribute('data-cost'));
+    const id = btnEl.dataset.id;
+    const cost = Number(btnEl.dataset.cost);
     btnEl.classList.toggle('buyable', cookies >= cost);
     btnEl.onclick = () => attemptBuy(id);
   });
 }
 
-// attempt purchase
+function refreshUI(){
+  totalEl.textContent = pretty(Math.floor(cookies));
+  metaTotal.textContent = pretty(Math.floor(cookies));
+  metaSession.textContent = pretty(Math.floor(sessionCookies));
+  cpsEl.textContent = getCPS().toFixed(2);
+  cpcEl.textContent = cookiesPerClick;
+  // upgrades buttons
+  const clickCost = getClickUpgradeCost(clickUpgradeLevel);
+  buyClickUpgradeBtn.textContent = `Buy (${pretty(clickCost)})`;
+  buyClickUpgradeBtn.classList.toggle('buyable', cookies >= clickCost);
+
+  const effCost = getEffUpgradeCost(effUpgradeLevel);
+  buyEffUpgradeBtn.textContent = `Buy (${pretty(effCost)})`;
+  buyEffUpgradeBtn.classList.toggle('buyable', cookies >= effCost);
+
+  renderBuildings();
+}
+
+/* ---------- INTERACTIONS ---------- */
+// Star click
+btn.addEventListener('click', () => {
+  // tiny pop
+  btn.style.transform = "scale(0.96)";
+  setTimeout(()=> btn.style.transform = "", 90);
+
+  cookies += cookiesPerClick;
+  sessionCookies += cookiesPerClick;
+  refreshUI();
+});
+
+// purchase building
 function attemptBuy(id){
-  const def = buildingDefs.find(d=>d.id===id);
+  const def = buildingDefs.find(d => d.id === id);
   if (!def) return;
   const state = buildingsState[id];
-  const cost = getCost(def, state.owned);
+  const cost = getBuildingCost(def, state.owned);
   if (cookies >= cost){
     cookies -= cost;
     state.owned += 1;
@@ -389,33 +471,30 @@ function attemptBuy(id){
   }
 }
 
-// UI refresh
-function refreshUI(){
-  totalEl.textContent = pretty(Math.floor(cookies));
-  metaTotal.textContent = pretty(Math.floor(cookies));
-  metaSession.textContent = pretty(Math.floor(sessionCookies));
-  cpsEl.textContent = getCPS().toFixed(2);
-  cpcEl.textContent = cookiesPerClick;
-  renderBuildings();
-}
-
-// clicking the star
-btn.addEventListener('click', () => {
-  btn.style.transform = "scale(0.96)";
-  setTimeout(()=> btn.style.transform = "", 90);
-
-  cookies += cookiesPerClick;
-  sessionCookies += cookiesPerClick;
-  refreshUI();
+// click upgrade
+buyClickUpgradeBtn.addEventListener('click', () => {
+  const cost = getClickUpgradeCost(clickUpgradeLevel);
+  if (cookies >= cost){
+    cookies -= cost;
+    clickUpgradeLevel += 1;
+    cookiesPerClick += 1; // +1 CPC per upgrade
+    refreshUI();
+  } else {
+    flashButton(buyClickUpgradeBtn);
+  }
 });
 
-// passive CPS accumulates each second (allow fractional)
-setInterval(() => {
-  const cps = getCPS();
-  cookies += cps;
-  sessionCookies += cps;
-  refreshUI();
-}, 1000);
+// efficiency upgrade
+buyEffUpgradeBtn.addEventListener('click', () => {
+  const cost = getEffUpgradeCost(effUpgradeLevel);
+  if (cookies >= cost){
+    cookies -= cost;
+    effUpgradeLevel += 1;
+    refreshUI();
+  } else {
+    flashButton(buyEffUpgradeBtn);
+  }
+});
 
 function flashButton(el){
   if (!el) return;
@@ -424,9 +503,24 @@ function flashButton(el){
   setTimeout(()=> { el.style.transform=""; el.style.boxShadow=""; }, 220);
 }
 
-// initial render
+/* ---------- PASSIVE CPS TICK ---------- */
+// accumulate CPS each second (fractional allowed)
+setInterval(() => {
+  const cps = getCPS();
+  if (cps > 0){
+    cookies += cps;
+    sessionCookies += cps;
+    refreshUI();
+  } else {
+    // still refresh quick UI to keep values accurate
+    refreshUI();
+  }
+}, 1000);
+
+/* ---------- INITIAL RENDER ---------- */
 renderBuildings();
 refreshUI();
+
 </script>
 </body>
 </html>
