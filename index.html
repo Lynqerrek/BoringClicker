@@ -238,7 +238,7 @@
           <h1>BoringClicker</h1>
           <div class="sub">Buy space things — produce cookies per second</div>
         </div>
-        <div class="sub" style="text-align:right">v1.3</div>
+        <div class="sub" style="text-align:right">v1.4</div>
       </div>
 
       <div id="totalCookies">0</div>
@@ -314,17 +314,14 @@
   </div>
 
 <script>
-/* BoringClicker v1.3 - Features added:
- - Click sound for player clicks and building purchases (ClickSound.mp3)
- - Global sound rate-limiter adaptive with CPS (prevents spam at huge CPS)
- - Settings modal with volume slider and rename field (max 20 chars)
- - StarCollector name shown above the star
- - Scrollbar styling
- - Asset preloading (Star image, background, sound) with loading bar
- - Harder progression: building cost scaling increased (1.17^owned) and expensive upgrades
+/* BoringClicker v1.4
+   - telescope and space_rocket starter costs and cps as requested
+   - nicer number shortification (commas + 'million' labeling)
+   - price scaling preserved
+   - preserves loading, settings, rate-limited click sound, rename, etc.
 */
 
-// ASSETS TO PRELOAD
+/* ---------- ASSET LOADING ---------- */
 const assets = ['StarClickMain.png', 'SpaceBackground.jfif', 'ClickSound.mp3'];
 let assetsLoaded = 0;
 const loadingOverlay = document.getElementById('loadingOverlay');
@@ -332,16 +329,10 @@ const loadingBar = document.getElementById('loadingBar');
 const loadingPercent = document.getElementById('loadingPercent');
 const gameWrap = document.getElementById('gameWrap');
 
-// SETTINGS STORAGE KEYS
-const LS_VOLUME = 'bc_volume_v1';
-const LS_NAME = 'bc_name_v1';
-
-// AUDIO: preload
+// AUDIO preload
 let clickAudio = new Audio('ClickSound.mp3');
 clickAudio.preload = 'auto';
 clickAudio.crossOrigin = 'anonymous';
-
-// Try to count audio as loaded when canplaythrough fires
 clickAudio.addEventListener('canplaythrough', () => { assetsLoaded++; updateLoadingProgress(); revealIfReady(); }, { once: true });
 clickAudio.addEventListener('error', () => { console.warn('Click sound failed to load'); assetsLoaded++; updateLoadingProgress(); revealIfReady(); }, { once: true });
 
@@ -352,8 +343,6 @@ assets.filter(a => a.endsWith('.png') || a.endsWith('.jfif')).forEach(src => {
   img.onload = () => { assetsLoaded++; updateLoadingProgress(); revealIfReady(); };
   img.onerror = () => { console.warn('Asset failed:', src); assetsLoaded++; updateLoadingProgress(); revealIfReady(); };
 });
-
-// helper to update loading bar
 function updateLoadingProgress(){
   const pct = Math.round((assetsLoaded / assets.length) * 100);
   loadingBar.style.width = pct + '%';
@@ -361,7 +350,6 @@ function updateLoadingProgress(){
 }
 function revealIfReady(){
   if (assetsLoaded >= assets.length){
-    // small polish delay
     setTimeout(()=> {
       loadingOverlay.style.transition = 'opacity .4s ease';
       loadingOverlay.style.opacity = 0;
@@ -371,17 +359,11 @@ function revealIfReady(){
     }, 300);
   }
 }
-
-// If audio didn't fire canplaythrough (browser policy), also count it as loaded after short timeout
 setTimeout(()=> {
   if (assetsLoaded < assets.length){
-    // assume audio load attempt done
-    if (!clickAudio.readyState || clickAudio.readyState < 3) {
-      // we still increment to avoid blocking
-      assetsLoaded = Math.min(assets.length, assetsLoaded + 1);
-      updateLoadingProgress();
-      revealIfReady();
-    }
+    assetsLoaded = Math.min(assets.length, assetsLoaded + 1);
+    updateLoadingProgress();
+    revealIfReady();
   }
 }, 2000);
 
@@ -390,13 +372,13 @@ setTimeout(()=> {
 let cookies = 0;
 let sessionCookies = 0;
 let cookiesPerClick = 1; // initial CPC
-let clickUpgradeLevel = 0; // number of click upgrades purchased
-let effUpgradeLevel = 0;   // building efficiency levels (each +10%)
+let clickUpgradeLevel = 0;
+let effUpgradeLevel = 0;
 
-// building definitions (more expensive; scaled to be harder)
+// Buildings: updated starter values for telescope and space_rocket as requested
 let buildingDefs = [
-  { id: 'telescope', name: 'Telescope', baseCost: 1000, baseCPS: 2.5, desc: 'Basic science: small CPS' },
-  { id: 'space_rocket', name: 'Space Rocket', baseCost: 8000, baseCPS: 22, desc: 'Rockets launching probes' },
+  { id: 'telescope', name: 'Telescope', baseCost: 15, baseCPS: 0.1, desc: 'Basic science: small CPS' },
+  { id: 'space_rocket', name: 'Space Rocket', baseCost: 200, baseCPS: 1.25, desc: 'Rockets launching probes' },
   { id: 'satellite', name: 'Satellite', baseCost: 45000, baseCPS: 210, desc: 'Orbiting machines, steady income' },
   { id: 'space_station', name: 'Space Station', baseCost: 350000, baseCPS: 1800, desc: 'Big orbital platform' },
   { id: 'solar_probe', name: 'Solar Probe', baseCost: 2200000, baseCPS: 10000, desc: 'Expensive probes near stars' },
@@ -405,7 +387,6 @@ let buildingDefs = [
   { id: 'alien_megaplanet', name: 'Alien Megaplanet', baseCost: 900000000, baseCPS: 3500000, desc: 'Mega investment: massive CPS' }
 ];
 
-// per-building owned count
 const buildingsState = {};
 buildingDefs.forEach(b => buildingsState[b.id] = { owned: 0 });
 
@@ -428,18 +409,18 @@ const settingsClose = document.getElementById('settingsClose');
 const volumeRange = document.getElementById('volumeRange');
 const nameInput = document.getElementById('nameInput');
 
-/* ---------- SETTINGS (volume & name) ---------- */
-let volume = Number(localStorage.getItem(LS_VOLUME) ?? 80) / 100; // 0..1
+/* ---------- SETTINGS ---------- */
+const LS_VOLUME = 'bc_volume_v1';
+const LS_NAME = 'bc_name_v1';
+let volume = Number(localStorage.getItem(LS_VOLUME) ?? 80) / 100;
 let starName = localStorage.getItem(LS_NAME) ?? 'StarCollector';
 volumeRange.value = Math.round(volume * 100);
 nameInput.value = starName;
 starNameEl.textContent = starName;
 
-// update volume slider handler
 volumeRange.addEventListener('input', (e) => {
   volume = Number(e.target.value) / 100;
   localStorage.setItem(LS_VOLUME, Math.round(volume * 100));
-  // set audio volume for base audio
   clickAudio.volume = volume;
 });
 nameInput.addEventListener('input', (e) => {
@@ -457,96 +438,88 @@ settingsClose.addEventListener('click', () => {
   settingsModal.setAttribute('aria-hidden','true');
 });
 
-/* ---------- HELPERS ---------- */
-function pretty(n){
-  if (n >= 1_000_000_000) return (n/1_000_000_000).toFixed(2) + 'b';
-  if (n >= 1_000_000) return (n/1_000_000).toFixed(2) + 'm';
-  if (n >= 1000) return (n/1000).toFixed(2) + 'k';
-  return Math.floor(n).toString();
+/* ---------- NUMBER FORMATTING (shortification + commas + million unit) ---------- */
+function formatNumber(n){
+  // n might be fractional; keep 2 decimals in some contexts
+  if (!isFinite(n)) return '0';
+  const abs = Math.abs(n);
+  if (abs < 1000) {
+    return Math.floor(n).toString();
+  }
+  if (abs < 1e6) {
+    // e.g., 15,000
+    return Math.floor(n).toLocaleString();
+  }
+  // millions
+  const millions = n / 1e6;
+  if (millions < 1000) {
+    // show up to 2 decimals for non-integer millions
+    const text = (Math.round(millions * 100) / 100);
+    // remove trailing .00
+    return (Number.isInteger(text) ? text.toLocaleString() : text.toFixed(2)) + ' million';
+  }
+  // thousands of millions (e.g., 1,000,000,000 -> 1,000 million)
+  const roundedMillions = Math.round(millions);
+  return roundedMillions.toLocaleString() + ' million';
 }
 
-// building cost formula: baseCost * (1.17 ^ owned) - slightly harsher scaling
+/* ---------- GAME FORMULAS ---------- */
+// cost scaling: baseCost * 1.17^owned (keeps rising but starter ones stay affordable)
 function getBuildingCost(def, owned){
   return Math.ceil(def.baseCost * Math.pow(1.17, owned));
 }
 
-// upgrade costs formula (scaling)
+// upgrade costs
 function getClickUpgradeCost(level){
-  return Math.ceil(8000 * Math.pow(3.2, level)); // very steep
+  return Math.ceil(8000 * Math.pow(3.2, level));
 }
 function getEffUpgradeCost(level){
   return Math.ceil(25000 * Math.pow(2.8, level));
 }
 
-// get total building CPS including efficiency multiplier
+// CPS calculations (efficiency multiplies)
 function getBuildingCPS(){
   let total = 0;
   for (const def of buildingDefs){
-    const owned = buildingsState[def.id].owned;
-    total += owned * def.baseCPS;
+    total += buildingsState[def.id].owned * def.baseCPS;
   }
   const multiplier = 1 + 0.1 * effUpgradeLevel;
   return total * multiplier;
 }
-
-// total CPS (no passive base)
-function getCPS(){
-  return getBuildingCPS();
-}
+function getCPS(){ return getBuildingCPS(); }
 
 /* ---------- AUDIO RATE LIMITER ---------- */
-/*
- Strategy:
-  - All click/purchase sounds go through playSound().
-  - We keep an array of timestamps (ms) of last sounds.
-  - Allowed sounds per second decreases slightly as CPS grows (so very high CPS -> fewer allowed sounds).
-  - Formula: maxSounds = clamp(1, 12, 12 - floor(log10(getCPS()+10)))
-    (for low CPS we allow many sounds; for huge CPS allowed number lower).
-  - playSound checks how many sounds played last 1000ms and blocks if over limit.
-  - Manual clicks and purchases still request playSound(), but will be rate-limited.
-  - Volume controlled by settings.
-*/
-
-let soundTimestamps = []; // timestamps in ms
+let soundTimestamps = [];
 clickAudio.volume = volume;
 clickAudio.loop = false;
-
 function getMaxSoundsPerSecond(){
   const cps = getCPS();
-  // log10 scaling helps reduce allowed at huge CPS; keep min 1
   const v = 12 - Math.floor(Math.log10(cps + 10));
   return Math.max(1, Math.min(12, v));
 }
-
 function playSound(){
   const now = Date.now();
-  // remove old timestamps > 1s
   soundTimestamps = soundTimestamps.filter(t => (now - t) <= 1000);
   const maxAllowed = getMaxSoundsPerSecond();
-  if (soundTimestamps.length >= maxAllowed) {
-    // too many sounds recently -> skip
-    return false;
-  }
+  if (soundTimestamps.length >= maxAllowed) return false;
   soundTimestamps.push(now);
-  // play a cloned audio element to allow overlapping
   try {
     const a = clickAudio.cloneNode();
     a.volume = volume;
-    a.play().catch(()=>{/* ignore play promise errors until user gesture */});
+    a.play().catch(()=>{});
   } catch(e){
-    // fallback: try to reset & play the base audio
     try { clickAudio.currentTime = 0; clickAudio.volume = volume; clickAudio.play().catch(()=>{}); } catch(_) {}
   }
   return true;
 }
 
-/* ---------- RENDER UI ---------- */
+/* ---------- UI RENDER ---------- */
 function renderBuildings(){
   buildingsList.innerHTML = '';
   buildingDefs.forEach(def => {
     const state = buildingsState[def.id];
     const cost = getBuildingCost(def, state.owned);
-    const effectivePer = (def.baseCPS * (1 + 0.1 * effUpgradeLevel)).toFixed(1);
+    const effectivePer = (def.baseCPS * (1 + 0.1 * effUpgradeLevel));
     const b = document.createElement('div');
     b.className = 'building';
     b.innerHTML = `
@@ -558,8 +531,8 @@ function renderBuildings(){
         </div>
       </div>
       <div class="b-right">
-        <div class="b-cost">Cost: <strong>${pretty(cost)}</strong></div>
-        <div class="b-cost">Gives: <strong>${effectivePer}</strong> CPS each</div>
+        <div class="b-cost">Cost: <strong>${formatNumber(cost)}</strong></div>
+        <div class="b-cost">Gives: <strong>${Number(effectivePer.toFixed(2))}</strong> CPS each</div>
         <div style="display:flex;gap:8px;align-items:center">
           <div style="font-size:13px;color:var(--muted);">Owned: <strong>${state.owned}</strong></div>
           <button class="buyBtn" data-id="${def.id}" data-cost="${cost}">Buy</button>
@@ -568,7 +541,6 @@ function renderBuildings(){
     `;
     buildingsList.appendChild(b);
   });
-  // wire buy buttons and toggles
   document.querySelectorAll('.buyBtn').forEach(btnEl=>{
     const id = btnEl.dataset.id;
     const cost = Number(btnEl.dataset.cost);
@@ -576,45 +548,32 @@ function renderBuildings(){
     btnEl.onclick = () => attemptBuy(id);
   });
 }
-
 function refreshUI(){
-  totalEl.textContent = pretty(Math.floor(cookies));
-  metaTotal.textContent = pretty(Math.floor(cookies));
-  metaSession.textContent = pretty(Math.floor(sessionCookies));
-  cpsEl.textContent = getCPS().toFixed(2);
+  totalEl.textContent = formatNumber(Math.floor(cookies));
+  metaTotal.textContent = formatNumber(Math.floor(cookies));
+  metaSession.textContent = formatNumber(Math.floor(sessionCookies));
+  cpsEl.textContent = Number(getCPS().toFixed(2));
   cpcEl.textContent = cookiesPerClick;
-
-  // upgrades buttons
   const clickCost = getClickUpgradeCost(clickUpgradeLevel);
-  buyClickUpgradeBtn.textContent = `Buy (${pretty(clickCost)})`;
+  buyClickUpgradeBtn.textContent = `Buy (${formatNumber(clickCost)})`;
   buyClickUpgradeBtn.classList.toggle('buyable', cookies >= clickCost);
-
   const effCost = getEffUpgradeCost(effUpgradeLevel);
-  buyEffUpgradeBtn.textContent = `Buy (${pretty(effCost)})`;
+  buyEffUpgradeBtn.textContent = `Buy (${formatNumber(effCost)})`;
   buyEffUpgradeBtn.classList.toggle('buyable', cookies >= effCost);
-
-  // name display
   starNameEl.textContent = starName;
-
   renderBuildings();
 }
 
 /* ---------- INTERACTIONS ---------- */
-// Manual star click -> plays sound (rate-limited), adds cookies
 btn.addEventListener('click', () => {
-  // small visual pop
   btn.style.transform = "scale(0.96)";
   setTimeout(()=> btn.style.transform = "", 120);
-
   cookies += cookiesPerClick;
   sessionCookies += cookiesPerClick;
-
-  // try to play click sound (rate-limited)
   playSound();
   refreshUI();
 });
 
-// purchase building
 function attemptBuy(id){
   const def = buildingDefs.find(d => d.id === id);
   if (!def) return;
@@ -623,31 +582,25 @@ function attemptBuy(id){
   if (cookies >= cost){
     cookies -= cost;
     state.owned += 1;
-    // play purchase sound (rate-limited through same system)
     playSound();
     refreshUI();
   } else {
-    // flash button visually
     const btnEl = document.querySelector(`.buyBtn[data-id="${id}"]`);
     flashButton(btnEl);
   }
 }
 
-// click upgrade
 buyClickUpgradeBtn.addEventListener('click', () => {
   const cost = getClickUpgradeCost(clickUpgradeLevel);
   if (cookies >= cost){
     cookies -= cost;
     clickUpgradeLevel += 1;
-    cookiesPerClick += 1; // +1 CPC per upgrade
+    cookiesPerClick += 1;
     playSound();
     refreshUI();
-  } else {
-    flashButton(buyClickUpgradeBtn);
-  }
+  } else flashButton(buyClickUpgradeBtn);
 });
 
-// efficiency upgrade
 buyEffUpgradeBtn.addEventListener('click', () => {
   const cost = getEffUpgradeCost(effUpgradeLevel);
   if (cookies >= cost){
@@ -655,9 +608,7 @@ buyEffUpgradeBtn.addEventListener('click', () => {
     effUpgradeLevel += 1;
     playSound();
     refreshUI();
-  } else {
-    flashButton(buyEffUpgradeBtn);
-  }
+  } else flashButton(buyEffUpgradeBtn);
 });
 
 function flashButton(el){
@@ -668,60 +619,32 @@ function flashButton(el){
 }
 
 /* ---------- PASSIVE CPS TICK ---------- */
-/*
- - Add CPS per second.
- - We will optionally play a passive sound occasionally, but heavily rate-limited by playSound()
-   (so high CPS won't spam sounds because getMaxSoundsPerSecond() drops a bit for huge CPS).
-*/
 setInterval(() => {
   const cps = getCPS();
   if (cps > 0){
     cookies += cps;
     sessionCookies += cps;
-
-    // occasionally play passive sound: request playSound() but it may be limited
-    // We trigger passive sound only if enough accumulated passive since last passive play
-    // to avoid playing every tick; simpler: playSound() but it will be rate-limited globally.
-    // We'll call it only if cps >= threshold (so small CPS doesn't play extra)
-    if (cps >= 100) { // for cps >=100 -> attempt passive sound once per second (and rate-limiter will cap)
-      playSound();
-    } else if (cps >= 5000) {
-      // higher CPS attempt more frequently (still rate-limited)
-      playSound();
-    }
+    // attempt occasional passive sound for very high CPS (rate-limited)
+    if (cps >= 500) playSound();
     refreshUI();
-  } else {
-    refreshUI();
-  }
+  } else refreshUI();
 }, 1000);
 
-/* ---------- INITIAL RENDER & PREP ---------- */
+/* ---------- INIT ---------- */
 renderBuildings();
 refreshUI();
-
-// make sure initial audio volume matches setting
 clickAudio.volume = volume;
 
-// Expose a quick keyboard for settings (Esc closes)
+// keyboard & modal helpers
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     settingsModal.style.display = 'none';
     settingsModal.setAttribute('aria-hidden','true');
   }
 });
+nameInput.addEventListener('blur', () => { localStorage.setItem(LS_NAME, nameInput.value.slice(0,20) || 'StarCollector'); });
+settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) { settingsModal.style.display = 'none'; settingsModal.setAttribute('aria-hidden','true'); } });
 
-// Save name on blur to localStorage as safety
-nameInput.addEventListener('blur', () => {
-  localStorage.setItem(LS_NAME, nameInput.value.slice(0,20) || 'StarCollector');
-});
-
-// ensure settings modal closes when clicking outside the card
-settingsModal.addEventListener('click', (e) => {
-  if (e.target === settingsModal) {
-    settingsModal.style.display = 'none';
-    settingsModal.setAttribute('aria-hidden','true');
-  }
-});
 </script>
 </body>
 </html>
