@@ -238,7 +238,7 @@
           <h1>BoringClicker</h1>
           <div class="sub">Buy space things — produce cookies per second</div>
         </div>
-        <div class="sub" style="text-align:right">v1.4</div>
+        <div class="sub" style="text-align:right">v1.5</div>
       </div>
 
       <div id="totalCookies">0</div>
@@ -314,11 +314,11 @@
   </div>
 
 <script>
-/* BoringClicker v1.4
-   - telescope and space_rocket starter costs and cps as requested
-   - nicer number shortification (commas + 'million' labeling)
-   - price scaling preserved
-   - preserves loading, settings, rate-limited click sound, rename, etc.
+/* BoringClicker v1.5
+ - All building values updated per user's list.
+ - registerBuilding helper makes it easy to add new buildings programmatically.
+ - formatNumber improved (commas + 'million' display).
+ - Keeps audio, settings, loading, rate-limiter, rename, scroll, upgrades, scaling.
 */
 
 /* ---------- ASSET LOADING ---------- */
@@ -375,20 +375,36 @@ let cookiesPerClick = 1; // initial CPC
 let clickUpgradeLevel = 0;
 let effUpgradeLevel = 0;
 
-// Buildings: updated starter values for telescope and space_rocket as requested
-let buildingDefs = [
-  { id: 'telescope', name: 'Telescope', baseCost: 15, baseCPS: 0.1, desc: 'Basic science: small CPS' },
-  { id: 'space_rocket', name: 'Space Rocket', baseCost: 200, baseCPS: 1.25, desc: 'Rockets launching probes' },
-  { id: 'satellite', name: 'Satellite', baseCost: 45000, baseCPS: 210, desc: 'Orbiting machines, steady income' },
-  { id: 'space_station', name: 'Space Station', baseCost: 350000, baseCPS: 1800, desc: 'Big orbital platform' },
-  { id: 'solar_probe', name: 'Solar Probe', baseCost: 2200000, baseCPS: 10000, desc: 'Expensive probes near stars' },
-  { id: 'tiny_planet', name: 'Tiny Planet', baseCost: 16000000, baseCPS: 53000, desc: 'Small artificial world' },
-  { id: 'gas_giant', name: 'Gas Giant', baseCost: 120000000, baseCPS: 420000, desc: 'Huge yields but very expensive' },
-  { id: 'alien_megaplanet', name: 'Alien Megaplanet', baseCost: 900000000, baseCPS: 3500000, desc: 'Mega investment: massive CPS' }
+// === INITIAL BUILDINGS DEFINITION ===
+// Edit this array to add or change buildings easily.
+// Each object needs: id (unique), name, baseCost (number), baseCPS (number), desc (string)
+const initialBuildings = [
+  { id: 'telescope', name: 'Telescope', baseCost: 15,           baseCPS: 0.1,    desc: 'Basic science: small CPS' },
+  { id: 'space_rocket', name: 'Space Rocket', baseCost: 200,    baseCPS: 1.25,   desc: 'Rockets launching probes' },
+  { id: 'satellite', name: 'Satellite', baseCost: 1100,         baseCPS: 9,      desc: 'Orbiting machines, steady income' },
+  { id: 'space_station', name: 'Space Station', baseCost: 12000, baseCPS: 48,     desc: 'Big orbital platform' },
+  { id: 'solar_probe', name: 'Solar Probe', baseCost: 130000,   baseCPS: 270,    desc: 'Expensive probes near stars' },
+  { id: 'tiny_planet', name: 'Tiny Planet', baseCost: 1_400_000, baseCPS: 1450, desc: 'Small artificial world' },
+  { id: 'gas_giant', name: 'Gas Giant', baseCost: 20_000_000,    baseCPS: 7800, desc: 'Huge yields but very expensive' },
+  { id: 'alien_megaplanet', name: 'Alien MegaPlanet', baseCost: 330_000_000, baseCPS: 44000, desc: 'Mega investment: massive CPS' }
 ];
 
-const buildingsState = {};
-buildingDefs.forEach(b => buildingsState[b.id] = { owned: 0 });
+// dynamic arrays used by game
+let buildingDefs = [];       // active definitions (populated by registerBuilding)
+const buildingsState = {};   // owned counts etc (populated by registerBuilding)
+
+/* registerBuilding makes it simple to add new buildings:
+   call registerBuilding({id,name,baseCost,baseCPS,desc})
+   it will initialize state and make it appear in the UI.
+*/
+function registerBuilding(def){
+  if (!def || !def.id) throw new Error('Invalid building definition');
+  buildingDefs.push(Object.assign({}, def));
+  buildingsState[def.id] = { owned: 0 };
+}
+
+/* register initial buildings */
+initialBuildings.forEach(b => registerBuilding(b));
 
 /* ---------- UI REFERENCES ---------- */
 const totalEl = document.getElementById('totalCookies');
@@ -438,25 +454,17 @@ settingsClose.addEventListener('click', () => {
   settingsModal.setAttribute('aria-hidden','true');
 });
 
-/* ---------- NUMBER FORMATTING (shortification + commas + million unit) ---------- */
+/* ---------- NUMBER FORMATTING (commas + million) ---------- */
 function formatNumber(n){
-  // n might be fractional; keep 2 decimals in some contexts
   if (!isFinite(n)) return '0';
   const abs = Math.abs(n);
-  if (abs < 1000) {
-    return Math.floor(n).toString();
-  }
-  if (abs < 1e6) {
-    // e.g., 15,000
-    return Math.floor(n).toLocaleString();
-  }
-  // millions
+  if (abs < 1000) return Math.floor(n).toString();
+  if (abs < 1e6) return Math.floor(n).toLocaleString();         // 15,000 -> "15,000"
   const millions = n / 1e6;
-  if (millions < 1000) {
+  if (millions < 1000){
     // show up to 2 decimals for non-integer millions
-    const text = (Math.round(millions * 100) / 100);
-    // remove trailing .00
-    return (Number.isInteger(text) ? text.toLocaleString() : text.toFixed(2)) + ' million';
+    const rounded = Math.round(millions * 100) / 100;
+    return (Number.isInteger(rounded) ? rounded.toLocaleString() : rounded.toFixed(2)) + ' million';
   }
   // thousands of millions (e.g., 1,000,000,000 -> 1,000 million)
   const roundedMillions = Math.round(millions);
@@ -464,20 +472,15 @@ function formatNumber(n){
 }
 
 /* ---------- GAME FORMULAS ---------- */
-// cost scaling: baseCost * 1.17^owned (keeps rising but starter ones stay affordable)
+// cost scaling: baseCost * scale^owned
+const COST_SCALE = 1.17;
 function getBuildingCost(def, owned){
-  return Math.ceil(def.baseCost * Math.pow(1.17, owned));
+  return Math.ceil(def.baseCost * Math.pow(COST_SCALE, owned));
 }
+function getClickUpgradeCost(level){ return Math.ceil(8000 * Math.pow(3.2, level)); }
+function getEffUpgradeCost(level){ return Math.ceil(25000 * Math.pow(2.8, level)); }
 
-// upgrade costs
-function getClickUpgradeCost(level){
-  return Math.ceil(8000 * Math.pow(3.2, level));
-}
-function getEffUpgradeCost(level){
-  return Math.ceil(25000 * Math.pow(2.8, level));
-}
-
-// CPS calculations (efficiency multiplies)
+// compute CPS
 function getBuildingCPS(){
   let total = 0;
   for (const def of buildingDefs){
@@ -548,19 +551,24 @@ function renderBuildings(){
     btnEl.onclick = () => attemptBuy(id);
   });
 }
+
 function refreshUI(){
   totalEl.textContent = formatNumber(Math.floor(cookies));
   metaTotal.textContent = formatNumber(Math.floor(cookies));
   metaSession.textContent = formatNumber(Math.floor(sessionCookies));
   cpsEl.textContent = Number(getCPS().toFixed(2));
   cpcEl.textContent = cookiesPerClick;
+
   const clickCost = getClickUpgradeCost(clickUpgradeLevel);
   buyClickUpgradeBtn.textContent = `Buy (${formatNumber(clickCost)})`;
   buyClickUpgradeBtn.classList.toggle('buyable', cookies >= clickCost);
+
   const effCost = getEffUpgradeCost(effUpgradeLevel);
   buyEffUpgradeBtn.textContent = `Buy (${formatNumber(effCost)})`;
   buyEffUpgradeBtn.classList.toggle('buyable', cookies >= effCost);
+
   starNameEl.textContent = starName;
+
   renderBuildings();
 }
 
@@ -624,7 +632,7 @@ setInterval(() => {
   if (cps > 0){
     cookies += cps;
     sessionCookies += cps;
-    // attempt occasional passive sound for very high CPS (rate-limited)
+    // occasional passive sound (rate-limited)
     if (cps >= 500) playSound();
     refreshUI();
   } else refreshUI();
@@ -644,6 +652,20 @@ document.addEventListener('keydown', (e) => {
 });
 nameInput.addEventListener('blur', () => { localStorage.setItem(LS_NAME, nameInput.value.slice(0,20) || 'StarCollector'); });
 settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) { settingsModal.style.display = 'none'; settingsModal.setAttribute('aria-hidden','true'); } });
+
+/* ---------- HOW TO ADD NEW BUILDINGS (dev notes) ----------
+  - To add a building at development time, edit initialBuildings above.
+  - To add a building dynamically at runtime, call:
+      registerBuilding({
+         id: 'new_id',
+         name: 'New Thing',
+         baseCost: 500000,
+         baseCPS: 250,
+         desc: 'A short description'
+      });
+    Then call refreshUI() to show it.
+  - Costs scale automatically using COST_SCALE (1.17 by default).
+---------------------------------------------------------------- */
 
 </script>
 </body>
